@@ -8,4 +8,9 @@ if (!supabaseUrl || !supabaseKey) {
     console.warn("Missing request headers for supabase. Check your environment variables.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Fallback to placeholders to prevent build crash if env vars are missing
+// Note: The app will not function correctly without valid credentials
+const url = supabaseUrl || "https://placeholder.supabase.co";
+const key = supabaseKey || "placeholder";
+
+export const supabase = createClient(url, key)
