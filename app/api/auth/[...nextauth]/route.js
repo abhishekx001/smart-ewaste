@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import connectDb from "@/db/connectDb";
-import User from "@/models/users";
+import { supabase } from "@/utils/supabase";
 
 const handler = NextAuth({
     providers: [
@@ -13,16 +12,20 @@ const handler = NextAuth({
                 role: { label: "Role", type: "text" }
             },
             async authorize(credentials) {
-                await connectDb();
-
                 try {
-                    const user = await User.findOne({ id: credentials.userId });
+                    // Query Supabase for the user
+                    // Assumes table 'users' with columns: user_id, password, role
+                    const { data: user, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('user_id', credentials.userId)
+                        .single();
 
-                    if (!user) {
+                    if (error || !user) {
                         throw new Error("No user found with this User ID");
                     }
 
-                    // Simple password check bycrypt used for hashed password check
+                    // Simple password check
                     if (user.password !== credentials.password) {
                         throw new Error("Invalid password");
                     }
@@ -33,8 +36,8 @@ const handler = NextAuth({
                     }
 
                     return {
-                        id: user._id.toString(),
-                        name: user.userId,
+                        id: user.id.toString(),
+                        name: user.user_id,
                         role: user.role
                     };
                 } catch (error) {

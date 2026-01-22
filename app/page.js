@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from "next/link";
+import Image from "next/image"; // Added Image import
 import { useSession, signOut } from "next-auth/react";
-import styles from "./page.module.css";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -14,163 +14,201 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.page}>
-      <nav className={styles.navbar}>
-        <Link href="/" className={styles.logo}>
-          Smart<span>Waste</span>
-        </Link>
+    <div className="min-h-screen relative font-sans flex flex-col">
+      {/* Global Background Image */}
+      <div className="absolute inset-0 bg-[url('/img1.webp')] bg-cover bg-center -z-20 fixed"></div>
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm -z-10 fixed"></div>
 
-        {/* Desktop Links */}
-        <div className={styles.navLinks}>
-          {status === 'authenticated' ? (
-            <>
-              {session?.user?.role === 'cleaner' && (
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300 font-montserrat">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative w-10 h-10 group-hover:scale-105 transition-transform duration-300">
+                <Image
+                  src="/logo.webp"
+                  alt="eWaste Logo"
+                  fill
+                  className="object-contain" // Use object-contain to keep aspect ratio
+                  priority
+                />
+              </div>
+              <span className="text-2xl font-bold text-green-700 font-oswald tracking-wide">
+                eWaste
+              </span>
+            </Link>
+
+            {/* Desktop Links */}
+            <div className="hidden md:flex items-center gap-6 font-medium">
+              {status === 'authenticated' ? (
                 <>
-                  <Link href="/add" className={styles.navBtn}>
+                  {session?.user?.role === 'cleaner' && (
+                    <>
+                      <Link href="/add" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Add Location
+                      </Link>
+                      <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Collection Points
+                      </Link>
+                    </>
+                  )}
+                  {session?.user?.role === 'driver' && (
+                    <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      Collection Points
+                    </Link>
+                  )}
+                  <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
+                    <span className="text-sm text-gray-700">Hi, <span className="font-semibold text-gray-900">{session?.user?.name || 'User'}</span></span>
+                    <button
+                      onClick={() => signOut()}
+                      className="px-4 py-2 rounded-full bg-red-100/80 text-red-700 hover:bg-red-200/80 font-medium transition-all text-sm"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link href="/add" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                     Add Location
                   </Link>
-                  <Link href="/collect" className={styles.navBtn}>
+                  <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                     Collection Points
+                  </Link>
+                  <Link href="/login" className="px-5 py-2.5 rounded-full bg-green-700 text-white font-medium hover:bg-green-800 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                    Login
                   </Link>
                 </>
               )}
-              {session?.user?.role === 'driver' && (
-                <Link href="/collect" className={styles.navBtn}>
-                  Collection Points
-                </Link>
-              )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '0.9rem', color: '#666' }}>Hi, {session?.user?.name || 'User'}</span>
-                <button
-                  onClick={() => signOut()}
-                  className={`${styles.navBtn} ${styles.navBtnPrimary}`}
-                  style={{ cursor: 'pointer', border: 'none' }}
-                >
-                  Logout
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <Link href="/add" className={styles.navBtn}>
-                Add Location
-              </Link>
-              <Link href="/collect" className={styles.navBtn}>
-                Collection Points
-              </Link>
-              <Link href="/login" className={`${styles.navBtn} ${styles.navBtnPrimary}`}>
-                Login
-              </Link>
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* Mobile Toggle Button */}
-        <button
-          className={styles.mobileMenuBtn}
-          onClick={toggleSidebar}
-          aria-label="Toggle Menu"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
+            {/* Mobile Toggle Button */}
+            <button
+              className="md:hidden p-2 rounded-md text-gray-800 hover:bg-white/50 transition-colors"
+              onClick={toggleSidebar}
+              aria-label="Toggle Menu"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
       </nav>
 
       {/* Full Page Sidebar */}
-      <div className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
-        <div className={styles.sidebarHeader}>
-          <button
-            className={styles.closeBtn}
-            onClick={toggleSidebar}
-            aria-label="Close Menu"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+      <div className={`fixed inset-0 z-[60] transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out md:hidden`}>
+        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={toggleSidebar}></div>
+        <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-2xl p-6 flex flex-col">
+          <div className="flex justify-end mb-8">
+            <button
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+              onClick={toggleSidebar}
+              aria-label="Close Menu"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
 
-        <div className={styles.sidebarLinks}>
-          {status === 'authenticated' ? (
-            <>
-              {session?.user?.role === 'cleaner' && (
-                <>
-                  <Link href="/add" className={styles.sidebarLink} onClick={toggleSidebar}>
-                    Add Location
-                  </Link>
-                  <Link href="/collect" className={styles.sidebarLink} onClick={toggleSidebar}>
+          <div className="flex flex-col gap-6">
+            {status === 'authenticated' ? (
+              <>
+                <div className="pb-4 border-b border-gray-100">
+                  <p className="text-sm text-gray-500">Signed in as</p>
+                  <p className="font-semibold text-gray-900 text-lg">{session?.user?.name || 'User'}</p>
+                </div>
+                {session?.user?.role === 'cleaner' && (
+                  <>
+                    <Link href="/add" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Add Location
+                    </Link>
+                    <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Collection Points
+                    </Link>
+                  </>
+                )}
+                {session?.user?.role === 'driver' && (
+                  <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                     Collection Points
                   </Link>
-                </>
-              )}
-              {session?.user?.role === 'driver' && (
-                <Link href="/collect" className={styles.sidebarLink} onClick={toggleSidebar}>
+                )}
+                <button
+                  onClick={() => {
+                    toggleSidebar();
+                    signOut();
+                  }}
+                  className="mt-auto w-full py-3 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors text-center"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/add" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                  Add Location
+                </Link>
+                <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                   Collection Points
                 </Link>
-              )}
-              <button
-                onClick={() => {
-                  toggleSidebar();
-                  signOut();
-                }}
-                className={styles.sidebarLink}
-                style={{ cursor: 'pointer' }}
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/add" className={styles.sidebarLink} onClick={toggleSidebar}>
-                Add Location
-              </Link>
-              <Link href="/collect" className={styles.sidebarLink} onClick={toggleSidebar}>
-                Collection Points
-              </Link>
-              <Link href="/login" className={styles.sidebarLink} onClick={toggleSidebar}>
-                Login
-              </Link>
-            </>
-          )}
+                <Link href="/login" className="w-full py-3 rounded-xl bg-green-600 text-white font-bold text-center hover:bg-green-700 shadow-lg transition-transform active:scale-95" onClick={toggleSidebar}>
+                  Login
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <main className={styles.hero}>
-        <h1 className={styles.heroTitle}>A Smarter Way to Manage City Waste</h1>
-        <p className={styles.heroSubtitle}>
-          Join our mission to create cleaner, greener cities through efficient waste collection and smart monitoring systems.
-        </p>
+      {/* Hero Section */}
+      <main className="flex-grow flex items-center justify-center relative overflow-hidden pt-16">
+        {/* Animated blobs */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-green-300/30 rounded-full blur-3xl mix-blend-multiply animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/30 rounded-full blur-3xl mix-blend-multiply animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-        <div className={styles.heroButtons}>
-          {status === 'authenticated' ? (
-            session?.user?.role === 'cleaner' ? (
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <Link href="/add" className={`${styles.ctaBtn} ${styles.ctaBtnPrimary}`}>
-                  Register Location
+        <div className="max-w-4xl mx-auto px-4 text-center z-10 py-20">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-white/50 backdrop-blur border border-green-100 text-green-700 text-sm font-semibold tracking-wide uppercase mb-6 shadow-sm font-montserrat">
+            Sustainable Future
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight mb-8 leading-tight font-raleway">
+            A Smarter Way to <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500">Manage City Waste</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed font-montserrat">
+            Join our mission to create cleaner, greener cities through efficient waste collection and smart geolocation monitoring systems.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {status === 'authenticated' ? (
+              session?.user?.role === 'cleaner' ? (
+                <>
+                  <Link href="/add" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                    Register Location
+                  </Link>
+                  <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                    View Points
+                  </Link>
+                </>
+              ) : (
+                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                  View Collection Points
                 </Link>
-                <Link href="/collect" className={`${styles.ctaBtn} ${styles.ctaBtnSecondary}`}>
-                  View Points
-                </Link>
-              </div>
+              )
             ) : (
-              <Link href="/collect" className={`${styles.ctaBtn} ${styles.ctaBtnPrimary}`}>
-                View Collection Points
-              </Link>
-            )
-          ) : (
-            <>
-              <Link href="/login" className={`${styles.ctaBtn} ${styles.ctaBtnPrimary}`}>
-                Get Started
-              </Link>
-              <Link href="/collect" className={`${styles.ctaBtn} ${styles.ctaBtnSecondary}`}>
-                View Map
-              </Link>
-            </>
-          )}
+              <>
+                <Link href="/login" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                  Get Started
+                </Link>
+                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                  View Map
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </main>
     </div>

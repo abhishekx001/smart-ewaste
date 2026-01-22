@@ -1,11 +1,9 @@
-import connectDb from "@/db/connectDb";
-import Location from "@/models/location";
+import { supabase } from "@/utils/supabase";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
     try {
         console.log("Request received");
-        await connectDb();
         const { address, pincode, city, latitude, longitude } = await request.json();
 
         if (!address || !pincode || !city || !latitude || !longitude) {
@@ -15,7 +13,13 @@ export async function POST(request) {
             );
         }
 
-        await Location.create({ address, pincode, city, geolocation: { latitude, longitude } });
+        const { error } = await supabase
+            .from('locations')
+            .insert({ address, pincode, city, latitude, longitude });
+
+        if (error) {
+            throw error;
+        }
 
         return NextResponse.json({ message: "Location saved successfully" }, { status: 201 });
     } catch (error) {
@@ -26,9 +30,27 @@ export async function POST(request) {
 
 export async function GET() {
     try {
-        await connectDb();
-        const locations = await Location.find({});
-        return NextResponse.json({ locations }, { status: 200 });
+        const { data: locations, error } = await supabase
+            .from('locations')
+            .select('*');
+
+        if (error) {
+            throw error;
+        }
+
+        // Transform data to match previous Mongoose schema structure if needed by frontend
+        // Mongoose schema had: geolocation: { latitude, longitude }
+        // We also map 'id' to '_id' to minimize frontend breakage if it expects _id
+        const formattedLocations = locations.map(loc => ({
+            ...loc,
+            _id: loc.id, // Alias id to _id
+            geolocation: {
+                latitude: loc.latitude,
+                longitude: loc.longitude
+            }
+        }));
+
+        return NextResponse.json({ locations: formattedLocations }, { status: 200 });
     } catch (error) {
         console.log(error);
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
@@ -37,14 +59,21 @@ export async function GET() {
 
 export async function DELETE(request) {
     try {
-        await connectDb();
         const { id } = await request.json();
 
         if (!id) {
             return NextResponse.json({ message: "Location ID required" }, { status: 400 });
         }
 
-        await Location.findByIdAndDelete(id);
+        const { error } = await supabase
+            .from('locations')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+
         return NextResponse.json({ message: "Location deleted successfully" }, { status: 200 });
     } catch (error) {
         console.log(error);
@@ -54,8 +83,6 @@ export async function DELETE(request) {
 
 export async function PUT(request) {
     try {
-        await connectDb();
-        // Updated to use search params if ID isn't in body using new URL(request.url).searchParams but standard JSON body is better for PUT
         const body = await request.json();
         const { id, address, city, pincode, latitude, longitude } = body;
 
@@ -63,22 +90,38 @@ export async function PUT(request) {
             return NextResponse.json({ message: "Location ID required" }, { status: 400 });
         }
 
-        const updatedLocation = await Location.findByIdAndUpdate(
-            id,
-            {
+        const { data: updatedLocation, error } = await supabase
+            .from('locations')
+            .update({
                 address,
                 city,
                 pincode,
-                geolocation: { latitude, longitude }
-            },
-            { new: true }
-        );
+                latitude,
+                longitude
+            })
+            .eq('id', id)
+            .select() // Return the updated record
+            .single();
+
+        if (error) {
+            throw error;
+        }
 
         if (!updatedLocation) {
             return NextResponse.json({ message: "Location not found" }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Location updated successfully", location: updatedLocation }, { status: 200 });
+        // Format response to match expected structure
+        const formattedLocation = {
+            ...updatedLocation,
+            _id: updatedLocation.id,
+            geolocation: {
+                latitude: updatedLocation.latitude,
+                longitude: updatedLocation.longitude
+            }
+        };
+
+        return NextResponse.json({ message: "Location updated successfully", location: formattedLocation }, { status: 200 });
 
     } catch (error) {
         console.log(error);
