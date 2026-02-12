@@ -60,7 +60,7 @@ export default function Home() {
                   <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
                     <span className="text-sm text-gray-700">Hi, <span className="font-semibold text-gray-900">{session?.user?.name || 'User'}</span></span>
                     <button
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ callbackUrl: '/' })}
                       className="px-4 py-2 rounded-full bg-red-100/80 text-red-700 hover:bg-red-200/80 font-medium transition-all text-sm"
                     >
                       Logout
@@ -140,7 +140,7 @@ export default function Home() {
                 <button
                   onClick={() => {
                     toggleSidebar();
-                    signOut();
+                    signOut({ callbackUrl: '/' });
                   }}
                   className="mt-auto w-full py-3 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors text-center"
                 >
