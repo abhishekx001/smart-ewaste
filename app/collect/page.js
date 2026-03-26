@@ -34,7 +34,7 @@ export default function CollectPage() {
     };
 
     useEffect(() => {
-        if (status === 'authenticated' && (session?.user?.role === 'driver' || session?.user?.role === 'cleaner')) {
+        if (status === 'authenticated' && (session?.user?.role === 'driver' || session?.user?.role === 'admin')) {
             const fetchLocations = async () => {
                 try {
                     const res = await fetch('/api/location');
@@ -78,14 +78,14 @@ export default function CollectPage() {
         );
     }
 
-    // Role check: Only drivers and cleaners can access this page
-    if (session?.user?.role !== 'driver' && session?.user?.role !== 'cleaner') {
+    // Role check: Only drivers and admins can access this page
+    if (session?.user?.role !== 'driver' && session?.user?.role !== 'admin') {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
                 <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border-t-4 border-red-500">
                     <h1 className="text-2xl font-bold text-red-600 mb-4 text-center">Access <span className="text-red-800">Denied</span></h1>
                     <p className="text-gray-600 text-center mb-6">
-                        This page is restricted to Drivers and Cleaners only. <br />
+                        This page is restricted to Drivers and Admins only. <br />
                         It seems this is not your purpose.
                     </p>
                     <Link href="/" className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-center font-bold rounded-xl transition-colors shadow-md">
@@ -150,7 +150,7 @@ export default function CollectPage() {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                     </Link>
 
-                                    {session?.user?.role === 'cleaner' && (
+                                    {session?.user?.role === 'admin' && (
                                         <>
                                             <Link
                                                 href={`/add?edit=true&id=${item._id}&street=${encodeURIComponent(item.address)}&city=${encodeURIComponent(item.city)}&pincode=${item.pincode}&lat=${item.geolocation.latitude}&lng=${item.geolocation.longitude}`}

@@ -157,14 +157,14 @@ function AddLocationContent() {
         );
     }
 
-    // Role check: Only cleaners can access this page
-    if (session?.user?.role !== 'cleaner') {
+    // Role check: Only admins can access this page
+    if (session?.user?.role !== 'admin') {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
                 <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border-t-4 border-red-500">
                     <h1 className="text-3xl font-bold text-red-600 mb-4 text-center">Access Denied</h1>
                     <p className="text-gray-600 text-center mb-6">
-                        This page is restricted to Cleaners only.<br />It seems this is not your purpose.
+                        This page is restricted to Admins only.<br />It seems this is not your purpose.
                     </p>
                     <Link href="/" className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-center font-bold rounded-xl transition-colors shadow-lg shadow-red-200">
                         Return Home

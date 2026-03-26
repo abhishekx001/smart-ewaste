@@ -12,7 +12,7 @@ export default function LoginPage() {
     const [formData, setFormData] = useState({
         userId: '',
         password: '',
-        role: 'cleaner' // Default role
+        role: 'admin' // Default role
     });
 
     const togglePasswordVisibility = () => {
@@ -76,13 +76,13 @@ export default function LoginPage() {
                     <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
                         <button
                             type="button"
-                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${formData.role === 'cleaner'
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${formData.role === 'admin'
                                 ? 'bg-white text-green-700 shadow-sm'
                                 : 'text-gray-500 hover:text-gray-700'
                                 }`}
-                            onClick={() => setFormData({ ...formData, role: 'cleaner' })}
+                            onClick={() => setFormData({ ...formData, role: 'admin' })}
                         >
-                            Cleaner
+                            Admin
                         </button>
                         <button
                             type="button"
@@ -93,6 +93,16 @@ export default function LoginPage() {
                             onClick={() => setFormData({ ...formData, role: 'driver' })}
                         >
                             Driver
+                        </button>
+                        <button
+                            type="button"
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${formData.role === 'user'
+                                ? 'bg-white text-green-700 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            onClick={() => setFormData({ ...formData, role: 'user' })}
+                        >
+                            User
                         </button>
                     </div>
 
@@ -167,7 +177,13 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center text-sm text-gray-500">
+                    <div className="mt-8 text-center text-sm text-gray-500 flex flex-col space-y-2">
+                        <span>
+                            Don't have an account?{' '}
+                            <Link href="/register" className="text-green-600 hover:text-green-700 font-semibold transition-colors">
+                                Register as User
+                            </Link>
+                        </span>
                         <Link href="/" className="hover:text-green-600 transition-colors">
                             Back to Home
                         </Link>

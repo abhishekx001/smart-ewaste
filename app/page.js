@@ -42,7 +42,7 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-6 font-medium">
               {status === 'authenticated' ? (
                 <>
-                  {session?.user?.role === 'cleaner' && (
+                  {session?.user?.role === 'admin' && (
                     <>
                       <Link href="/add" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         Add Location
@@ -50,12 +50,30 @@ export default function Home() {
                       <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         Collection Points
                       </Link>
+                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Manage Complaints
+                      </Link>
                     </>
                   )}
                   {session?.user?.role === 'driver' && (
-                    <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
-                      Collection Points
-                    </Link>
+                    <>
+                      <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Collection Points
+                      </Link>
+                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        My Dispatches
+                      </Link>
+                    </>
+                  )}
+                  {session?.user?.role === 'user' && (
+                    <>
+                      <Link href="/complaints/new" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Submit Complaint
+                      </Link>
+                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        My Complaints
+                      </Link>
+                    </>
                   )}
                   <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
                     <span className="text-sm text-gray-700">Hi, <span className="font-semibold text-gray-900">{session?.user?.name || 'User'}</span></span>
@@ -122,7 +140,7 @@ export default function Home() {
                   <p className="text-sm text-gray-500">Signed in as</p>
                   <p className="font-semibold text-gray-900 text-lg">{session?.user?.name || 'User'}</p>
                 </div>
-                {session?.user?.role === 'cleaner' && (
+                {session?.user?.role === 'admin' && (
                   <>
                     <Link href="/add" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       Add Location
@@ -130,12 +148,30 @@ export default function Home() {
                     <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       Collection Points
                     </Link>
+                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Manage Complaints
+                    </Link>
                   </>
                 )}
                 {session?.user?.role === 'driver' && (
-                  <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
-                    Collection Points
-                  </Link>
+                  <>
+                    <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Collection Points
+                    </Link>
+                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      My Dispatches
+                    </Link>
+                  </>
+                )}
+                {session?.user?.role === 'user' && (
+                  <>
+                    <Link href="/complaints/new" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Submit Complaint
+                    </Link>
+                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      My Complaints
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={() => {
@@ -184,13 +220,25 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {status === 'authenticated' ? (
-              session?.user?.role === 'cleaner' ? (
+              session?.user?.role === 'admin' ? (
                 <>
                   <Link href="/add" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
                     Register Location
                   </Link>
                   <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
                     View Points
+                  </Link>
+                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-amber-500 text-white font-bold text-lg shadow-lg shadow-amber-200 hover:shadow-xl hover:bg-amber-600 transition-all transform hover:-translate-y-1">
+                    Complaints
+                  </Link>
+                </>
+              ) : session?.user?.role === 'user' ? (
+                <>
+                  <Link href="/complaints/new" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                    Submit Complaint
+                  </Link>
+                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                    View My Complaints
                   </Link>
                 </>
               ) : (
