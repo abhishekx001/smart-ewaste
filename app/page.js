@@ -50,6 +50,9 @@ export default function Home() {
                       <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         Collection Points
                       </Link>
+                      <Link href="/collected" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Collected Bins
+                      </Link>
                       <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         Manage Complaints
                       </Link>
@@ -59,6 +62,9 @@ export default function Home() {
                     <>
                       <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         Collection Points
+                      </Link>
+                      <Link href="/collected" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                        Collected Bins
                       </Link>
                       <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
                         My Dispatches
@@ -148,6 +154,9 @@ export default function Home() {
                     <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       Collection Points
                     </Link>
+                    <Link href="/collected" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Collected Bins
+                    </Link>
                     <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       Manage Complaints
                     </Link>
@@ -157,6 +166,9 @@ export default function Home() {
                   <>
                     <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       Collection Points
+                    </Link>
+                    <Link href="/collected" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                      Collected Bins
                     </Link>
                     <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
                       My Dispatches

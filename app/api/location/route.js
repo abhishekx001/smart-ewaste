@@ -28,22 +28,35 @@ export async function POST(request) {
     }
 }
 
-export async function GET() {
+export async function GET(request) {
     try {
-        const { data: locations, error } = await supabase
-            .from('locations')
-            .select('*');
+        const { searchParams } = new URL(request.url);
+        const role = searchParams.get('role');
+        const userId = searchParams.get('userId');
+        const status = searchParams.get('status');
+
+        let query = supabase.from('locations').select('*');
+
+        if (status === 'pending') {
+            // Null or pending both mean it's not collected yet
+            query = query.neq('status', 'collected');
+        } else if (status === 'collected') {
+            query = query.eq('status', 'collected');
+        }
+
+        if (role === 'driver' && userId) {
+            query = query.or(`assigned_driver.is.null,assigned_driver.eq.${userId}`);
+        }
+
+        const { data: locations, error } = await query;
 
         if (error) {
             throw error;
         }
 
-        // Transform data to match previous Mongoose schema structure if needed by frontend
-        // Mongoose schema had: geolocation: { latitude, longitude }
-        // We also map 'id' to '_id' to minimize frontend breakage if it expects _id
         const formattedLocations = locations.map(loc => ({
             ...loc,
-            _id: loc.id, // Alias id to _id
+            _id: loc.id,
             geolocation: {
                 latitude: loc.latitude,
                 longitude: loc.longitude
@@ -52,7 +65,38 @@ export async function GET() {
 
         return NextResponse.json({ locations: formattedLocations }, { status: 200 });
     } catch (error) {
-        console.log(error);
+        console.log("Error in GET /api/location:", error);
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    }
+}
+
+export async function PATCH(request) {
+    try {
+        const body = await request.json();
+        const { id, assigned_driver, status } = body;
+
+        if (!id) {
+            return NextResponse.json({ message: "Location ID required" }, { status: 400 });
+        }
+
+        const updates = {};
+        if (assigned_driver !== undefined) updates.assigned_driver = assigned_driver;
+        if (status !== undefined) updates.status = status;
+
+        const { data: updatedLocation, error } = await supabase
+            .from('locations')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        return NextResponse.json({ message: "Location assigned successfully", location: updatedLocation }, { status: 200 });
+    } catch (error) {
+        console.log("Error in PATCH /api/location:", error);
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }

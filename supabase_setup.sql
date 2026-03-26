@@ -26,8 +26,15 @@ CREATE TABLE IF NOT EXISTS locations (
   city text not null,
   latitude text not null,
   longitude text not null,
+  assigned_driver text, -- To track which driver accepted the location
+  status text default 'pending', -- 'pending' or 'collected'
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- Note: If locations table already exists, run this to add the new columns:
+-- ALTER TABLE locations ADD COLUMN IF NOT EXISTS assigned_driver text;
+-- ALTER TABLE locations ADD COLUMN IF NOT EXISTS status text default 'pending';
+-- UPDATE locations SET status = 'pending' WHERE status IS NULL;
 
 -- 3. Create the 'complaints' table
 CREATE TABLE IF NOT EXISTS complaints (

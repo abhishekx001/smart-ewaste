@@ -33,11 +33,60 @@ export default function CollectPage() {
         }
     };
 
+    const handleAccept = async (id) => {
+        try {
+            const res = await fetch('/api/location', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id, assigned_driver: session.user.name }),
+            });
+
+            if (res.ok) {
+                setLocations(prev => prev.map(item => item._id === id ? { ...item, assigned_driver: session.user.name } : item));
+            } else {
+                alert('Failed to accept location');
+            }
+        } catch (error) {
+            console.error('Error accepting location:', error);
+            alert('An error occurred while accepting');
+        }
+    };
+
+    const handleMarkCollected = async (id) => {
+        if (!confirm('Are you sure you want to mark this location as collected?')) return;
+        try {
+            const res = await fetch('/api/location', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id, status: 'collected' }),
+            });
+
+            if (res.ok) {
+                // Remove from the list as it is now collected
+                setLocations(prev => prev.filter(item => item._id !== id));
+            } else {
+                alert('Failed to mark location as collected');
+            }
+        } catch (error) {
+            console.error('Error updating location status:', error);
+            alert('An error occurred while updating status');
+        }
+    };
+
     useEffect(() => {
         if (status === 'authenticated' && (session?.user?.role === 'driver' || session?.user?.role === 'admin')) {
             const fetchLocations = async () => {
                 try {
-                    const res = await fetch('/api/location');
+                    const params = new URLSearchParams({
+                        role: session.user.role,
+                        userId: session.user.name,
+                        status: 'pending'
+                    });
+                    const res = await fetch(`/api/location?${params.toString()}`);
                     if (!res.ok) throw new Error('Failed to fetch data');
                     const data = await res.json();
                     setLocations(data.locations || []);
@@ -138,9 +187,13 @@ export default function CollectPage() {
                                     </div>
                                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-2" title={item.address}>{item.address}</h3>
                                     <p className="text-gray-500 text-sm mb-4">{item.city}</p>
+                                    
+                                    {item.assigned_driver && session?.user?.role === 'admin' && (
+                                        <p className="text-xs font-bold text-purple-600 bg-purple-50 inline-block px-2 py-1 rounded">Assigned to: {item.assigned_driver}</p>
+                                    )}
                                 </div>
 
-                                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+                                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-2">
                                     <Link
                                         href={`https://www.google.com/maps/search/?api=1&query=${item.geolocation.latitude},${item.geolocation.longitude}`}
                                         target="_blank"
@@ -149,6 +202,27 @@ export default function CollectPage() {
                                         <span>Map</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                     </Link>
+
+                                    {session?.user?.role === 'driver' && (
+                                        item.assigned_driver === session.user.name ? (
+                                            <button
+                                                onClick={() => handleMarkCollected(item._id)}
+                                                className="flex-1 py-1 px-3 rounded-lg font-bold text-sm bg-green-600 text-white hover:bg-green-700 shadow-sm transition-colors text-center"
+                                                title="Mark this location as collected"
+                                            >
+                                                Mark as Collected
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleAccept(item._id)}
+                                                disabled={!!item.assigned_driver}
+                                                className={`flex-1 py-1 px-3 rounded-lg font-bold text-sm transition-colors ${item.assigned_driver ? 'bg-gray-400 text-white cursor-not-allowed opacity-80' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'}`}
+                                                title={item.assigned_driver ? "Already accepted" : "Accept this location"}
+                                            >
+                                                {item.assigned_driver ? 'Taken' : 'Accept'}
+                                            </button>
+                                        )
+                                    )}
 
                                     {session?.user?.role === 'admin' && (
                                         <>
