@@ -73,7 +73,12 @@ export async function GET(request) {
             throw new Error(error.message);
         }
 
-        return new Response(JSON.stringify({ complaints: data || [] }), {
+        const formattedComplaints = data.map(complaint => ({
+            ...complaint,
+            _id: complaint.id
+        }));
+
+        return new Response(JSON.stringify({ complaints: formattedComplaints }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });

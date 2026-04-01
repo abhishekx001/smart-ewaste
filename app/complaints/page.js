@@ -184,7 +184,7 @@ export default function ComplaintsPage() {
                                         {item.status}
                                     </span>
                                     <span className="text-[10px] text-textMuted font-semibold uppercase tracking-widest italic opacity-50">
-                                        ID: {item._id.slice(-6)}
+                                        ID: {String(item._id || '').slice(-6)}
                                     </span>
                                 </div>
                                 <h3 className="text-lg font-semibold text-textPrimary mb-1 italic leading-tight capitalize">{item.bin_location}</h3>

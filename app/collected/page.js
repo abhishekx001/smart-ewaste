@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { MapPin, CheckCircle, ExternalLink, ChevronLeft, LayoutPanelLeft, Clock } from 'lucide-react';
+import { MapPin, CheckCircle, ExternalLink, ChevronLeft, LayoutPanelLeft, Clock, Trash2 } from 'lucide-react';
 
 export default function CollectedPage() {
     const { data: session, status } = useSession();
