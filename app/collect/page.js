@@ -2,34 +2,48 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { 
+    MapPin, 
+    CheckCircle, 
+    ExternalLink, 
+    Trash2, 
+    Edit2, 
+    AlertCircle, 
+    ChevronLeft, 
+    Menu, 
+    X, 
+    Trash, 
+    ShieldCheck, 
+    History 
+} from 'lucide-react';
+import Image from 'next/image';
 
 export default function CollectPage() {
     const { data: session, status } = useSession();
     const [locations, setLocations] = useState([]);
     const [loadingData, setLoadingData] = useState(true);
     const [error, setError] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this location?')) return;
-
+        if (!confirm('are you sure you want to delete this location?')) return;
         try {
             const res = await fetch('/api/location', {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),
             });
-
             if (res.ok) {
                 setLocations(prev => prev.filter(item => item._id !== id));
             } else {
-                alert('Failed to delete location');
+                alert('failed to delete location');
             }
         } catch (error) {
             console.error('Error deleting location:', error);
-            alert('An error occurred while deleting');
+            alert('an error occurred while deleting');
         }
     };
 
@@ -37,43 +51,36 @@ export default function CollectPage() {
         try {
             const res = await fetch('/api/location', {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, assigned_driver: session.user.name }),
             });
-
             if (res.ok) {
                 setLocations(prev => prev.map(item => item._id === id ? { ...item, assigned_driver: session.user.name } : item));
             } else {
-                alert('Failed to accept location');
+                alert('failed to accept location');
             }
         } catch (error) {
             console.error('Error accepting location:', error);
-            alert('An error occurred while accepting');
+            alert('an error occurred while accepting');
         }
     };
 
     const handleMarkCollected = async (id) => {
-        if (!confirm('Are you sure you want to mark this location as collected?')) return;
+        if (!confirm('are you sure you want to mark this location as collected?')) return;
         try {
             const res = await fetch('/api/location', {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, status: 'collected' }),
             });
-
             if (res.ok) {
-                // Remove from the list as it is now collected
                 setLocations(prev => prev.filter(item => item._id !== id));
             } else {
-                alert('Failed to mark location as collected');
+                alert('failed to mark location as collected');
             }
         } catch (error) {
             console.error('Error updating location status:', error);
-            alert('An error occurred while updating status');
+            alert('an error occurred while updating status');
         }
     };
 
@@ -87,11 +94,11 @@ export default function CollectPage() {
                         status: 'pending'
                     });
                     const res = await fetch(`/api/location?${params.toString()}`);
-                    if (!res.ok) throw new Error('Failed to fetch data');
+                    if (!res.ok) throw new Error('failed to fetch data');
                     const data = await res.json();
                     setLocations(data.locations || []);
                 } catch (err) {
-                    setError('Failed to load collection points');
+                    setError('failed to load collection points');
                     console.error(err);
                 } finally {
                     setLoadingData(false);
@@ -105,143 +112,165 @@ export default function CollectPage() {
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen"></div>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (status === 'unauthenticated') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/10">
-                    <h1 className="text-2xl font-bold text-textPrimary mb-4 text-center">Authentication <span className="text-warning">Required</span></h1>
-                    <p className="text-textMuted text-center mb-6">
-                        You must be logged in as a driver to view collection points.
-                    </p>
-                    <Link href="/login" className="block w-full py-3 px-4 bg-neonGreen text-black text-center font-bold rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all">
-                        Go to Login
-                    </Link>
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-surface p-10 rounded-lg border border-borderColor text-center">
+                    <AlertCircle className="w-12 h-12 text-warning mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold mb-2">authentication required</h1>
+                    <p className="text-sm text-textMuted mb-8">you must be logged in as a driver to view collection points.</p>
+                    <Link href="/login" className="btn-primary inline-block w-full text-center">go to login</Link>
                 </div>
             </div>
         );
     }
 
-    // Role check: Only drivers and admins can access this page
     if (session?.user?.role !== 'driver' && session?.user?.role !== 'admin') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-danger/30">
-                    <h1 className="text-2xl font-bold text-danger mb-4 text-center">Access <span className="text-danger/80">Denied</span></h1>
-                    <p className="text-textMuted text-center mb-6">
-                        This page is restricted to Drivers and Admins only. <br />
-                        It seems this is not your purpose.
-                    </p>
-                    <Link href="/" className="block w-full py-3 px-4 bg-danger/20 text-danger border border-danger/30 text-center font-bold rounded-xl hover:bg-danger/30 transition-all">
-                        Return Home
-                    </Link>
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-red-50 p-10 rounded-lg border border-red-100 text-center">
+                    <AlertCircle className="w-12 h-12 text-danger mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold text-danger mb-2">access denied</h1>
+                    <p className="text-sm text-red-600/70 mb-8">this page is restricted to drivers and admins only.</p>
+                    <Link href="/" className="btn-secondary inline-block w-full text-center">return home</Link>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-appBg font-sans text-textPrimary">
-            <header className="bg-appBg border-b border-white/10 py-12 mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-10 w-64 h-64 bg-neonGreen/10 rounded-full blur-[80px] mix-blend-screen pointer-events-none"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left relative z-10 animate-fade-in-up">
-                    <h1 className="text-4xl font-extrabold text-textPrimary mb-2 tracking-tight">
-                        Collection <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonGreen to-electricBlue">Points</span>
+        <div className="min-h-screen bg-white font-poppins text-textPrimary selection:bg-primary/10">
+            {/* Global Navbar */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-borderColor">
+                <div className="max-w-[1280px] mx-auto px-6 h-20 flex justify-between items-center">
+                    <Link href="/" className="flex items-center gap-3">
+                        <Trash className="w-5 h-5 text-primary" />
+                        <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
+                    </Link>
+
+                    {/* Desktop Nav */}
+                    <div className="hidden lg:flex items-center gap-8">
+                        <Link href="/" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Home</Link>
+                        <Link href="/collect" className="text-sm font-semibold text-primary italic px-3 py-1 bg-primary/5 rounded">Live Map</Link>
+                        <Link href="/complaints" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Complaints</Link>
+                        <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs font-bold text-danger italic pl-6 border-l border-borderColor">Logout</button>
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95" 
+                        onClick={toggleSidebar}
+                    >
+                        {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                    </button>
+                </div>
+            </nav>
+
+            {/* Header */}
+            <header className="pt-32 pb-12 px-6 mb-12 bg-white">
+                <div className="max-w-[1280px] mx-auto">
+                    <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-bold text-textMuted hover:text-primary transition-colors mb-6 uppercase tracking-widest italic">
+                        <ChevronLeft className="w-3 h-3" /> system overview
+                    </Link>
+                    <h1 className="text-3xl font-semibold tracking-tight uppercase italic flex items-center gap-4">
+                        <MapPin className="text-primary w-8 h-8" /> collection network
                     </h1>
-                    <p className="text-lg text-textMuted max-w-2xl">List of locations scheduled for pickup today. Optimize your route efficiently.</p>
+                    <p className="text-sm text-textMuted mt-1">optimize bin retrieval routes across the metropolitan sector</p>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <main className="max-w-[1280px] mx-auto px-6 pb-24">
                 {loadingData ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen mb-4"></div>
-                        <p className="text-textMuted">Loading collection points...</p>
+                    <div className="flex flex-col items-center justify-center py-32 border border-dashed border-borderColor rounded-lg">
+                        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-sm text-textMuted italic">fetching points...</p>
                     </div>
                 ) : error ? (
-                    <div className="text-center py-16 bg-danger/10 rounded-2xl border border-danger/30">
-                        <p className="text-danger font-semibold">{error}</p>
+                    <div className="text-center py-20 bg-red-50 rounded-lg border border-red-100">
+                        <p className="text-danger font-medium text-sm">{error}</p>
                     </div>
                 ) : locations.length === 0 ? (
-                    <div className="text-center py-20 bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 mb-4 text-textMuted">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        </div>
-                        <p className="text-xl text-textMuted font-medium">No collection points found.</p>
-                        <p className="text-textMuted/70 mt-2">Check back later or register a new location.</p>
+                    <div className="text-center py-32 bg-surface rounded-lg border border-borderColor border-dashed">
+                        <MapPin className="w-12 h-12 text-textMuted mx-auto mb-6 opacity-20" />
+                        <p className="text-lg font-medium text-textMuted">no collection points found.</p>
+                        <p className="text-xs text-textMuted mt-1 italic uppercase tracking-widest">check back later or register a new site</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {locations.map((item) => (
-                            <div key={item._id} className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10 overflow-hidden group flex flex-col h-full hover:border-neonGreen/30 transition-all duration-300">
-                                <div className="p-6 flex-grow">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="bg-neonGreen/10 p-2 rounded-xl text-neonGreen group-hover:bg-neonGreen group-hover:text-black transition-colors duration-300 border border-neonGreen/20">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <div key={item._id} className="bg-surface border border-borderColor rounded-lg overflow-hidden flex flex-col hover:bg-white transition-all duration-150 group">
+                                <div className="p-8 flex-grow">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="w-10 h-10 bg-white border border-borderColor rounded flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                            <MapPin className="w-5 h-5" />
                                         </div>
-                                        <span className="text-xs font-bold px-3 py-1 bg-black/30 border border-white/10 text-textMuted rounded-full">{item.pincode}</span>
+                                        <span className="text-[10px] font-bold text-textMuted uppercase tracking-widest bg-white border border-borderColor px-2 py-1 rounded">
+                                            {item.pincode}
+                                        </span>
                                     </div>
-                                    <h3 className="text-lg font-bold text-textPrimary mb-2 group-hover:text-neonGreen transition-colors line-clamp-2" title={item.address}>{item.address}</h3>
-                                    <p className="text-textMuted text-sm mb-4">{item.city}</p>
+                                    <h3 className="text-lg font-semibold text-textPrimary mb-2 leading-snug">{item.address}</h3>
+                                    <p className="text-sm text-textMuted mb-6 italic">{item.city}</p>
                                     
                                     {item.assigned_driver && session?.user?.role === 'admin' && (
-                                        <p className="text-xs font-bold text-electricBlue bg-electricBlue/10 border border-electricBlue/20 inline-block px-3 py-1 rounded-full">Assigned to: {item.assigned_driver}</p>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded text-[10px] font-bold text-secondary uppercase tracking-wider italic">
+                                            assigned: {item.assigned_driver}
+                                        </div>
                                     )}
                                 </div>
 
-                                <div className="px-6 py-4 bg-black/20 border-t border-white/10 flex flex-wrap gap-2">
+                                <div className="p-6 bg-white border-t border-borderColor flex flex-wrap gap-3">
                                     <Link
                                         href={item.geolocation.latitude && item.geolocation.longitude ? `https://www.google.com/maps/search/?api=1&query=${item.geolocation.latitude},${item.geolocation.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.address}, ${item.city}, ${item.pincode}`)}`}
                                         target="_blank"
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl border border-electricBlue/40 text-electricBlue font-medium hover:bg-electricBlue/10 transition-all text-sm"
+                                        className="btn-secondary flex-1 flex items-center justify-center gap-2 text-xs py-2.5 italic border-secondary/20"
                                     >
-                                        <span>Map</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        <span>open map</span>
+                                        <ExternalLink className="w-3 h-3" />
                                     </Link>
 
                                     {session?.user?.role === 'driver' && (
                                         item.assigned_driver === session.user.name ? (
                                             <button
                                                 onClick={() => handleMarkCollected(item._id)}
-                                                className="flex-1 py-1 px-3 rounded-xl font-bold text-sm bg-neonGreen text-black hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all text-center"
+                                                className="btn-primary flex-1 py-1 px-3 text-xs italic"
                                                 title="Mark this location as collected"
                                             >
-                                                Mark as Collected
+                                                confirm collection
                                             </button>
                                         ) : (
                                             <button
                                                 onClick={() => handleAccept(item._id)}
                                                 disabled={!!item.assigned_driver}
-                                                className={`flex-1 py-1 px-3 rounded-xl font-bold text-sm transition-all ${item.assigned_driver ? 'bg-white/10 text-textMuted cursor-not-allowed border border-white/10' : 'bg-neonGreen text-black hover:scale-105 hover:shadow-[0_0_20px_#00FF88]'}`}
-                                                title={item.assigned_driver ? "Already accepted" : "Accept this location"}
+                                                className={`flex-1 py-1 px-3 rounded-lg font-bold text-xs transition-all uppercase tracking-widest italic ${item.assigned_driver ? 'bg-surface text-textMuted cursor-not-allowed border border-borderColor' : 'btn-primary'}`}
                                             >
-                                                {item.assigned_driver ? 'Taken' : 'Accept'}
+                                                {item.assigned_driver ? 'taken' : 'reserve pickup'}
                                             </button>
                                         )
                                     )}
 
                                     {session?.user?.role === 'admin' && (
-                                        <>
+                                        <div className="flex gap-2">
                                             <Link
                                                 href={`/add?edit=true&id=${item._id}&street=${encodeURIComponent(item.address)}&city=${encodeURIComponent(item.city)}&pincode=${item.pincode}&lat=${item.geolocation.latitude}&lng=${item.geolocation.longitude}`}
-                                                className="p-2 rounded-xl bg-warning/20 text-warning border border-warning/30 hover:bg-warning/30 transition-colors"
+                                                className="p-2.5 rounded-lg border border-borderColor hover:bg-surface transition-colors"
                                                 title="Edit"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                <Edit2 className="w-4 h-4 text-textMuted" />
                                             </Link>
                                             <button
-                                                className="p-2 rounded-xl bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30 transition-colors"
+                                                className="p-2.5 rounded-lg border border-red-50 hover:bg-red-50 transition-colors"
                                                 onClick={() => handleDelete(item._id)}
                                                 title="Delete"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                                <Trash2 className="w-4 h-4 text-danger" />
                                             </button>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -249,6 +278,106 @@ export default function CollectPage() {
                     </div>
                 )}
             </main>
+
+            <footer className="bg-primary pt-24 pb-16">
+                <div className="max-w-[1280px] mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
+                        <div className="flex items-center gap-3">
+                            <Trash className="w-5 h-5 text-secondary" />
+                            <span className="text-xl font-semibold text-white tracking-tight italic">EcoTrack</span>
+                        </div>
+                        <div className="flex items-center gap-10">
+                            <Link href="/" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">home</Link>
+                            <Link href="/collect" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">bins map</Link>
+                            <Link href="/complaints" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">complaints</Link>
+                        </div>
+                        <div className="text-xs text-secondary font-bold uppercase tracking-widest italic">
+                            &copy; 2026 eco systems
+                        </div>
+                    </div>
+                    <div className="flex justify-center pt-12 border-t border-white/10">
+                        <p className="text-[10px] text-white/30 tracking-[0.4em] uppercase font-bold">mission: clean city logistics</p>
+                    </div>
+                </div>
+            </footer>
+
+            {/* Mobile Sidebar */}
+            <div 
+                className={`fixed inset-0 z-[100] lg:hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+            >
+                {/* Backdrop overlay */}
+                <div 
+                    className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                    onClick={toggleSidebar}
+                ></div>
+                
+                {/* Sliding Panel */}
+                <div 
+                    className={`absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white p-8 shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                >
+                    <div className="flex justify-between items-center mb-12">
+                        <Link href="/" className="flex items-center gap-2" onClick={toggleSidebar}>
+                            <Trash className="w-5 h-5 text-primary" />
+                            <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
+                        </Link>
+                        <button 
+                            onClick={toggleSidebar} 
+                            className="w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="mb-12">
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] italic mb-1">operator</p>
+                            <p className="text-2xl font-semibold text-textPrimary leading-none">{session?.user?.name}</p>
+                            <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/5 border border-primary/10 rounded mt-4">
+                                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">{session?.user?.role} portal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-8 flex-grow overflow-y-auto pr-2 pb-8">
+                        <Link href="/" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Home</span>
+                            <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">general overview</p>
+                        </Link>
+                        <Link href="/collect" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-primary italic leading-none">Live Map</span>
+                            <p className="text-[10px] text-primary/50 mt-1 uppercase tracking-widest font-bold italic">real-time routing</p>
+                        </Link>
+                        <Link href="/complaints" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Complaints</span>
+                            <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">incident logs</p>
+                        </Link>
+                        <Link href="/collected" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">History</span>
+                            <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">audit archives</p>
+                        </Link>
+                        
+                        <button 
+                            onClick={() => { signOut({ callbackUrl: '/' }); toggleSidebar(); }}
+                            className="text-left mt-4"
+                        >
+                            <span className="text-2xl font-bold text-danger italic">Logout</span>
+                        </button>
+                    </div>
+
+                    <div className="absolute bottom-10 left-8 right-8 pt-10 border-t border-borderColor">
+                        <div className="flex justify-between items-center bg-surface p-6 rounded-lg border border-borderColor">
+                            <div>
+                                <p className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">status</p>
+                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-secondary">
+                                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+                                    NETWORK SECURE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

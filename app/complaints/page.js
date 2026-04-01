@@ -1,269 +1,341 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { 
+    AlertCircle, 
+    CheckCircle2, 
+    Clock, 
+    Trash2, 
+    User, 
+    MapPin, 
+    ShieldCheck, 
+    ChevronLeft, 
+    Menu, 
+    X, 
+    Trash, 
+    Truck 
+} from "lucide-react";
+import Image from "next/image";
 
 export default function ComplaintsPage() {
     const { data: session, status } = useSession();
     const [complaints, setComplaints] = useState([]);
-    const [loadingData, setLoadingData] = useState(true);
-    const [error, setError] = useState('');
-
+    const [loading, setLoading] = useState(true);
     const [drivers, setDrivers] = useState([]);
-    const [solvingId, setSolvingId] = useState(null);
-    const [selectedDriver, setSelectedDriver] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     useEffect(() => {
         if (status === 'authenticated' && ['user', 'admin', 'driver'].includes(session?.user?.role)) {
             const fetchComplaints = async () => {
+                let url = `/api/complaints?userId=${session.user.name}&role=${session.user.role}`;
                 try {
-                    let url = `/api/complaints?userId=${session.user.name}&role=${session.user.role}`;
                     const res = await fetch(url);
-                    if (!res.ok) throw new Error('Failed to fetch complaints');
                     const data = await res.json();
                     setComplaints(data.complaints || []);
                 } catch (err) {
-                    setError('Failed to load past complaints');
+                    console.error("Fetch complaints error:", err);
                 } finally {
-                    setLoadingData(false);
+                    setLoading(false);
                 }
             };
+
+            const fetchDrivers = async () => {
+                if (session.user.role === 'admin') {
+                    try {
+                        const res = await fetch('/api/drivers');
+                        const data = await res.json();
+                        setDrivers(data.drivers || []);
+                    } catch (err) {
+                        console.error("Fetch drivers error:", err);
+                    }
+                }
+            };
+
             fetchComplaints();
-            if (session?.user?.role === 'admin') {
-                fetch('/api/drivers')
-                    .then(res => res.json())
-                    .then(data => setDrivers(data.drivers || []))
-                    .catch(err => console.error("Drivers fetch error:", err));
-            }
+            fetchDrivers();
         } else if (status !== 'loading') {
-            setLoadingData(false);
+            setLoading(false);
         }
     }, [status, session]);
 
+    const handleUpdateStatus = async (id, newStatus) => {
+        try {
+            const res = await fetch('/api/complaints', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: newStatus }),
+            });
+            if (res.ok) {
+                setComplaints(complaints.map(c => c._id === id ? { ...c, status: newStatus } : c));
+            }
+        } catch (err) {
+            console.error("Update status error:", err);
+        }
+    };
+
+    const handleAssignDriver = async (id, driverName) => {
+        try {
+            const res = await fetch('/api/complaints', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, assigned_driver: driverName }),
+            });
+            if (res.ok) {
+                setComplaints(complaints.map(c => c._id === id ? { ...c, assigned_driver: driverName } : c));
+            }
+        } catch (err) {
+            console.error("Assign driver error:", err);
+        }
+    };
+
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case 'resolved': return 'bg-secondary/5 text-secondary border-secondary/20';
+            case 'in-progress': return 'bg-primary/5 text-primary border-primary/20';
+            default: return 'bg-warning/5 text-warning border-warning/20';
+        }
+    };
+
     if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen"></div>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (status === 'unauthenticated' || !['user', 'admin', 'driver'].includes(session?.user?.role)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-danger/30">
-                    <h1 className="text-2xl font-bold text-danger mb-4 text-center">Access Denied</h1>
-                    <p className="text-textMuted text-center mb-6">
-                        You must be logged in to view complaints.
-                    </p>
-                    <Link href="/login" className="block w-full py-3 px-4 bg-danger/20 text-danger border border-danger/30 text-center font-bold rounded-xl hover:bg-danger/30 transition-all">
-                        Go to Login
-                    </Link>
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-surface p-10 rounded-lg border border-borderColor text-center">
+                    <AlertCircle className="w-12 h-12 text-warning mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold mb-2">Access Restricted</h1>
+                    <p className="text-sm text-textMuted mb-8">Please sign in to view incident logs.</p>
+                    <Link href="/login" className="btn-primary inline-block w-full text-center">Login</Link>
                 </div>
             </div>
         );
     }
 
-    const handleStatusChange = async (id, newStatus) => {
-        try {
-            const res = await fetch('/api/complaints', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, status: newStatus })
-            });
-            if (res.ok) {
-                setComplaints(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
-            } else {
-                alert('Failed to update status');
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleAssignDriver = async (id) => {
-        if (!selectedDriver) {
-            alert('Please select a driver first!');
-            return;
-        }
-        try {
-            const res = await fetch('/api/complaints', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, assigned_driver: selectedDriver, status: 'assigned' })
-            });
-            if (res.ok) {
-                setComplaints(prev => prev.map(c => c.id === id ? { ...c, assigned_driver: selectedDriver, status: 'assigned' } : c));
-                setSolvingId(null);
-                setSelectedDriver('');
-            } else {
-                alert('Failed to assign driver');
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-appBg font-sans text-textPrimary">
-            <header className="bg-appBg border-b border-white/10 py-12 mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-10 w-64 h-64 bg-neonGreen/10 rounded-full blur-[80px] mix-blend-screen pointer-events-none"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-6 relative z-10 animate-fade-in-up">
-                    <div>
-                        <h1 className="text-4xl font-extrabold text-textPrimary mb-2 tracking-tight">
-                            {session?.user?.role === 'admin' ? 'All ' : session?.user?.role === 'driver' ? 'Dispatched ' : 'My '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonGreen to-electricBlue">Complaints</span>
-                        </h1>
-                        <p className="text-lg text-textMuted max-w-2xl">
-                            {session?.user?.role === 'admin' ? 'Manage and update reported issues.' : 'Track the status of your past reports.'}
-                        </p>
+        <div className="min-h-screen bg-white font-poppins text-textPrimary selection:bg-primary/10">
+            {/* Global Navbar */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-borderColor">
+                <div className="max-w-[1280px] mx-auto px-6 h-20 flex justify-between items-center">
+                    <Link href="/" className="flex items-center gap-3">
+                        <Trash className="w-5 h-5 text-primary" />
+                        <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
+                    </Link>
+
+                    {/* Desktop Nav */}
+                    <div className="hidden lg:flex items-center gap-8">
+                        <Link href="/" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Home</Link>
+                        <Link href="/collect" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Bins Map</Link>
+                        <Link href="/complaints" className="text-sm font-semibold text-primary italic px-3 py-1 bg-primary/5 rounded">Complaints</Link>
+                        <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs font-bold text-danger italic pl-6 border-l border-borderColor">Logout</button>
                     </div>
-                    {session?.user?.role === 'user' && (
-                        <div>
-                            <Link href="/complaints/new" className="px-6 py-3 bg-neonGreen text-black font-bold rounded-xl shadow-md hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all inline-block">
-                                + New Complaint
-                            </Link>
-                        </div>
-                    )}
+
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95" 
+                        onClick={toggleSidebar}
+                    >
+                        {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                    </button>
+                </div>
+            </nav>
+
+            <header className="pt-32 pb-12 px-6 bg-white border-b border-borderColor/50">
+                <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                    <div>
+                        <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-bold text-textMuted hover:text-primary transition-colors mb-6 uppercase tracking-widest italic">
+                            <ChevronLeft className="w-3" /> Dashboard
+                        </Link>
+                        <h1 className="text-3xl font-semibold tracking-tight uppercase italic flex items-center gap-4">
+                            <AlertCircle className="w-8 h-8 text-danger" /> Incident Center
+                        </h1>
+                        <p className="text-sm text-textMuted mt-1">Audit trail of city-wide waste management alerts and dispatches</p>
+                    </div>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                {loadingData ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen mb-4"></div>
-                        <p className="text-textMuted">Loading your complaints...</p>
-                    </div>
-                ) : error ? (
-                    <div className="text-center py-16 bg-danger/10 rounded-2xl border border-danger/30">
-                        <p className="text-danger font-semibold">{error}</p>
+            <main className="max-w-[1280px] mx-auto px-6 py-12">
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-32 bg-white rounded-lg border border-dashed border-borderColor">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-sm text-textMuted italic uppercase font-semibold">syncing logs...</p>
                     </div>
                 ) : complaints.length === 0 ? (
-                    <div className="text-center py-20 bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 mb-4 text-textMuted">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        </div>
-                        <p className="text-xl text-textMuted font-medium">No complaints found.</p>
-                        <p className="text-textMuted/70 mt-2">You haven't reported any issues yet.</p>
+                    <div className="text-center py-32 bg-surface rounded-lg border border-borderColor border-dashed">
+                        <CheckCircle2 className="w-12 h-12 text-secondary mx-auto mb-6 opacity-20" />
+                        <h3 className="text-sm font-semibold uppercase tracking-widest text-textMuted italic">no pending alerts</h3>
+                        <p className="text-xs text-textMuted mt-2 italic">all metropolitan sectors are clear</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {complaints.map((item) => (
-                            <div key={item.id} className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10 p-6 flex flex-col hover:border-neonGreen/30 transition-all duration-300">
-                                <div className="flex justify-between items-start mb-4">
-                                    <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide border ${
-                                        item.status === 'resolved' ? 'bg-neonGreen/10 text-neonGreen border-neonGreen/30' :
-                                        item.status === 'assigned' ? 'bg-electricBlue/10 text-electricBlue border-electricBlue/30' :
-                                        item.status === 'approved' ? 'bg-warning/10 text-warning border-warning/30' :
-                                        'bg-white/10 text-textMuted border-white/20'
-                                    }`}>
-                                        <div className={`inline-block w-2 h-2 rounded-full mr-1 ${
-                                            item.status === 'resolved' ? 'bg-neonGreen animate-pulse' :
-                                            item.status === 'assigned' ? 'bg-electricBlue animate-pulse' :
-                                            item.status === 'approved' ? 'bg-warning animate-pulse' :
-                                            'bg-textMuted animate-pulse'
-                                        }`}></div>
-                                        {item.status || 'Pending'}
+                            <div key={item._id} className="bg-surface border border-borderColor rounded-lg overflow-hidden flex flex-col hover:bg-white transition-all duration-150 group px-8 pb-8 pt-10">
+                                <div className="flex justify-between items-start mb-6">
+                                    <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded border ${getStatusStyle(item.status)}`}>
+                                        {item.status}
                                     </span>
-                                    <span className="text-xs text-textMuted font-medium whitespace-nowrap">
-                                        {new Date(item.created_at).toLocaleDateString()}
+                                    <span className="text-[10px] text-textMuted font-semibold uppercase tracking-widest italic opacity-50">
+                                        ID: {item._id.slice(-6)}
                                     </span>
                                 </div>
+                                <h3 className="text-lg font-semibold text-textPrimary mb-1 italic leading-tight capitalize">{item.bin_location}</h3>
+                                <p className="text-sm text-textMuted mb-6 italic leading-relaxed">"{item.description}"</p>
                                 
-                                {session?.user?.role === 'admin' && (
-                                    <p className="text-xs text-textMuted/70 mb-2 font-mono">Reported by: {item.user_details}</p>
-                                )}
-                                {item.assigned_driver && session?.user?.role === 'admin' && (
-                                    <p className="text-xs text-electricBlue font-bold mb-2">Assigned to: {item.assigned_driver}</p>
-                                )}
-                                
-                                <h3 className="text-lg font-bold text-textPrimary mb-2">{item.bin_location}</h3>
-                                <p className="text-textMuted text-sm flex-grow bg-black/30 p-3 rounded-xl border border-white/10">
-                                    {item.description}
-                                </p>
-                                
-                                {item.image_data && (
-                                    <div className="mt-4 w-full h-40 relative rounded-xl overflow-hidden border border-white/10 shadow-sm">
-                                        <img src={item.image_data} alt="Complaint Evidence" className="object-cover w-full h-full hover:scale-105 transition-transform duration-300" />
+                                <div className="mt-auto space-y-5">
+                                    <div className="flex items-center gap-3 text-[10px] text-textMuted font-bold uppercase tracking-widest italic pt-6 border-t border-borderColor/50">
+                                        <Clock className="w-3.5" />
+                                        <span>Log Date: {new Date(item.created_at).toLocaleDateString()}</span>
                                     </div>
-                                )}
-
-                                {item.latitude && item.longitude && (
-                                    <div className="mt-4">
-                                        <Link
-                                            href={`https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`}
-                                            target="_blank"
-                                            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-electricBlue/10 border border-electricBlue/30 text-electricBlue font-semibold hover:bg-electricBlue/20 transition-all text-sm shadow-sm"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                            View Pinned Location
-                                        </Link>
-                                    </div>
-                                )}
-                                
-                                {session?.user?.role === 'admin' && (
-                                    <div className="mt-4 pt-4 border-t border-white/10">
-                                        {solvingId === item.id ? (
-                                            <div className="flex flex-col gap-3">
-                                                <p className="text-xs font-bold text-textMuted uppercase tracking-wide">Select Driver</p>
-                                                <select 
-                                                    value={selectedDriver} 
-                                                    onChange={(e) => setSelectedDriver(e.target.value)}
-                                                    className="w-full p-2.5 bg-black/30 border border-white/10 rounded-xl text-sm text-textPrimary outline-none focus:ring-2 focus:ring-neonGreen font-semibold cursor-pointer"
+                                    
+                                    {session.user.role === 'admin' && (
+                                        <div className="space-y-4">
+                                            <div className="flex flex-col gap-2">
+                                                <label className="text-[10px] font-bold text-textMuted uppercase tracking-widest italic pb-1">Dispatch Agent</label>
+                                                <select
+                                                    value={item.assigned_driver || ''}
+                                                    onChange={(e) => handleAssignDriver(item._id, e.target.value)}
+                                                    className="input-field text-xs bg-white py-2"
                                                 >
-                                                    <option value="" disabled className="bg-appBg">--- Available Drivers ---</option>
-                                                    {drivers.map(d => (
-                                                        <option key={d.user_id} value={d.user_id} className="bg-appBg">{d.user_id}</option>
+                                                    <option value="">unassigned</option>
+                                                    {drivers.map((d, i) => (
+                                                        <option key={i} value={d.name}>{d.name}</option>
                                                     ))}
                                                 </select>
-                                                <div className="flex gap-2">
-                                                    <button 
-                                                        onClick={() => handleAssignDriver(item.id)}
-                                                        className="flex-1 py-2 bg-neonGreen text-black font-bold rounded-xl text-sm transition-all hover:scale-105 hover:shadow-[0_0_20px_#00FF88]"
-                                                    >
-                                                        Send Options
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => { setSolvingId(null); setSelectedDriver(''); }}
-                                                        className="px-4 py-2 border border-white/10 text-textMuted hover:text-textPrimary font-bold rounded-xl text-sm transition-colors"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
                                             </div>
-                                        ) : (
-                                            <button 
-                                                onClick={() => setSolvingId(item.id)}
-                                                className="w-full py-2.5 bg-black/30 border border-white/10 hover:border-neonGreen/40 text-textPrimary hover:text-neonGreen font-bold rounded-xl text-sm transition-colors shadow-sm"
-                                            >
-                                                Solve (Assign Driver)
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-                                
-                                {(session?.user?.role === 'admin' || session?.user?.role === 'driver') && (
-                                    <div className="mt-4 pt-4 border-t border-white/10 flex gap-2">
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => handleUpdateStatus(item._id, 'in-progress')}
+                                                    className="btn-secondary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest"
+                                                >
+                                                    deploy
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleUpdateStatus(item._id, 'resolved')}
+                                                    className="btn-primary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest"
+                                                >
+                                                    archive
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {session.user.role === 'driver' && item.assigned_driver === session.user.name && (
                                         <button 
-                                            onClick={() => handleStatusChange(item.id, 'approved')}
-                                            className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${item.status === 'approved' ? 'bg-warning text-black border-warning pointer-events-none' : 'bg-warning/10 text-warning border-warning/30 hover:bg-warning/20'}`}
+                                            onClick={() => handleUpdateStatus(item._id, 'resolved')}
+                                            className="btn-primary w-full py-3 text-xs italic font-bold uppercase tracking-widest"
                                         >
-                                            {item.status === 'approved' ? 'Approved ✓' : 'Approve'}
+                                            mark resolved
                                         </button>
-                                        <button 
-                                            onClick={() => handleStatusChange(item.id, 'resolved')}
-                                            className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${item.status === 'resolved' ? 'bg-neonGreen text-black border-neonGreen pointer-events-none' : 'bg-neonGreen/10 text-neonGreen border-neonGreen/30 hover:bg-neonGreen/20'}`}
-                                        >
-                                            {item.status === 'resolved' ? 'Resolved ✓' : 'Resolve'}
-                                        </button>
-                                    </div>
-                                )}
+                                    )}
+
+                                    {session.user.role === 'user' && (
+                                        <div className="flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded text-[10px] font-bold text-textMuted uppercase tracking-wider italic">
+                                            <User className="w-3" /> Agent: {item.assigned_driver || 'pending dispatch'}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
                 )}
             </main>
+
+            <footer className="bg-primary pt-24 pb-16">
+                <div className="max-w-[1280px] mx-auto px-6">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-16 mb-16 flex-col md:flex-row gap-8">
+                        <div className="flex items-center gap-3">
+                            <Trash className="w-5 h-5 text-secondary" />
+                            <span className="text-xl font-semibold text-white tracking-tight italic">EcoTrack</span>
+                        </div>
+                        <div className="flex items-center gap-10">
+                            <Link href="/" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold">home</Link>
+                            <Link href="/collect" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold">bins network</Link>
+                            <Link href="/complaints" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold underline underline-offset-8 decoration-secondary">incidents</Link>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+            {/* Mobile Sidebar */}
+            <div 
+                className={`fixed inset-0 z-[100] lg:hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+            >
+                {/* Backdrop overlay */}
+                <div 
+                    className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                    onClick={toggleSidebar}
+                ></div>
+                
+                {/* Sliding Panel */}
+                <div 
+                    className={`absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white p-8 shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                >
+                    <div className="flex justify-between items-center mb-12">
+                        <Link href="/" className="flex items-center gap-2" onClick={toggleSidebar}>
+                            <Trash className="w-5 h-5 text-primary" />
+                            <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
+                        </Link>
+                        <button 
+                            onClick={toggleSidebar} 
+                            className="w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="mb-12">
+                        <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] italic mb-1">active session</p>
+                        <p className="text-2xl font-semibold text-textPrimary leading-none">{session?.user?.name}</p>
+                        <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/5 border border-primary/10 rounded mt-4">
+                            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-[10px] font-bold text-primary uppercase tracking-wider">{session?.user?.role} portal</span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-8 flex-grow overflow-y-auto pr-2 pb-8">
+                        <Link href="/" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Overview</span>
+                            <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">main dashboard</p>
+                        </Link>
+                        <Link href="/collect" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Live Map</span>
+                            <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">network monitoring</p>
+                        </Link>
+                        <Link href="/complaints" className="group" onClick={toggleSidebar}>
+                            <span className="text-3xl font-semibold text-primary italic leading-none">Complaints</span>
+                            <p className="text-[10px] text-primary/50 mt-1 uppercase tracking-widest font-bold italic">incident management</p>
+                        </Link>
+                        
+                        <button 
+                            onClick={() => { signOut({ callbackUrl: '/' }); toggleSidebar(); }}
+                            className="text-left mt-4"
+                        >
+                            <span className="text-2xl font-bold text-danger italic">Logout</span>
+                        </button>
+                    </div>
+
+                    <div className="absolute bottom-10 left-8 right-8 pt-10 border-t border-borderColor">
+                        <div className="flex justify-between items-center bg-surface p-6 rounded-lg border border-borderColor">
+                            <div>
+                                <p className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">system health</p>
+                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-secondary">
+                                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+                                    SECURE NODE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

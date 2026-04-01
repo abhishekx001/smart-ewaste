@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { MapPin, CheckCircle, ExternalLink, ChevronLeft, LayoutPanelLeft, Clock } from 'lucide-react';
 
 export default function CollectedPage() {
     const { data: session, status } = useSession();
@@ -20,11 +21,11 @@ export default function CollectedPage() {
                         status: 'collected'
                     });
                     const res = await fetch(`/api/location?${params.toString()}`);
-                    if (!res.ok) throw new Error('Failed to fetch data');
+                    if (!res.ok) throw new Error('failed to fetch data');
                     const data = await res.json();
                     setLocations(data.locations || []);
                 } catch (err) {
-                    setError('Failed to load collected points');
+                    setError('failed to load collected points');
                     console.error(err);
                 } finally {
                     setLoadingData(false);
@@ -38,23 +39,20 @@ export default function CollectedPage() {
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen"></div>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (status === 'unauthenticated') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/10">
-                    <h1 className="text-2xl font-bold text-textPrimary mb-4 text-center">Authentication <span className="text-warning">Required</span></h1>
-                    <p className="text-textMuted text-center mb-6">
-                        You must be logged in to view collected points.
-                    </p>
-                    <Link href="/login" className="block w-full py-3 px-4 bg-neonGreen text-black text-center font-bold rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all">
-                        Go to Login
-                    </Link>
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-surface p-10 rounded-lg border border-borderColor text-center">
+                    <LayoutPanelLeft className="w-12 h-12 text-warning mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold mb-2">authentication required</h1>
+                    <p className="text-sm text-textMuted mb-8">you must be logged in to view collected points.</p>
+                    <Link href="/login" className="btn-primary inline-block w-full text-center">go to login</Link>
                 </div>
             </div>
         );
@@ -62,82 +60,80 @@ export default function CollectedPage() {
 
     if (session?.user?.role !== 'driver' && session?.user?.role !== 'admin') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-danger/30">
-                    <h1 className="text-2xl font-bold text-danger mb-4 text-center">Access <span className="text-danger/80">Denied</span></h1>
-                    <p className="text-textMuted text-center mb-6">
-                        This page is restricted to Drivers and Admins only.
-                    </p>
-                    <Link href="/" className="block w-full py-3 px-4 bg-danger/20 text-danger border border-danger/30 text-center font-bold rounded-xl hover:bg-danger/30 transition-all">
-                        Return Home
-                    </Link>
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-red-50 p-10 rounded-lg border border-red-100 text-center">
+                    <LayoutPanelLeft className="w-12 h-12 text-danger mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold text-danger mb-2">access denied</h1>
+                    <p className="text-sm text-red-600/70 mb-8">this page is restricted to drivers and admins only.</p>
+                    <Link href="/" className="btn-secondary inline-block w-full text-center">return home</Link>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-appBg font-sans text-textPrimary">
-            <header className="bg-appBg border-b border-white/10 py-12 mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-10 w-64 h-64 bg-neonGreen/10 rounded-full blur-[80px] mix-blend-screen pointer-events-none"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left relative z-10 animate-fade-in-up">
-                    <h1 className="text-4xl font-extrabold text-textPrimary mb-2 tracking-tight">
-                        Collected <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonGreen to-electricBlue">Bins</span>
-                    </h1>
-                    <p className="text-lg text-textMuted max-w-2xl">
-                        {session.user.role === 'admin' ? 'View all bins that have been successfully collected by drivers.' : 'View history of bins you have collected.'}
+        <div className="min-h-screen bg-white font-poppins text-textPrimary selection:bg-primary/10 pb-20">
+            {/* Header */}
+            <header className="border-b border-borderColor bg-white py-12 px-6 mb-12">
+                <div className="max-w-[1280px] mx-auto">
+                    <Link href="/" className="inline-flex items-center gap-2 text-xs font-medium text-textMuted hover:text-primary transition-colors mb-4 italic">
+                        <ChevronLeft className="w-3 h-3" /> back to home
+                    </Link>
+                    <h1 className="text-3xl font-semibold tracking-tight uppercase italic text-secondary">collected history</h1>
+                    <p className="text-sm text-textMuted mt-1">
+                        {session.user.role === 'admin' ? 'audit trail of all successfully processed bin collections.' : 'your personal history of completed collections.'}
                     </p>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <main className="max-w-[1280px] mx-auto px-6">
                 {loadingData ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen mb-4"></div>
-                        <p className="text-textMuted">Loading collected bins...</p>
+                    <div className="flex flex-col items-center justify-center py-32 border border-dashed border-borderColor rounded-lg">
+                        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-sm text-textMuted italic">loading history...</p>
                     </div>
                 ) : error ? (
-                    <div className="text-center py-16 bg-danger/10 rounded-2xl border border-danger/30">
-                        <p className="text-danger font-semibold">{error}</p>
+                    <div className="text-center py-20 bg-red-50 rounded-lg border border-red-100">
+                        <p className="text-danger font-medium text-sm">{error}</p>
                     </div>
                 ) : locations.length === 0 ? (
-                    <div className="text-center py-20 bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 mb-4 text-neonGreen">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                        <p className="text-xl text-textMuted font-medium">No collected bins found.</p>
-                        <p className="text-textMuted/70 mt-2">Completed pickups will appear here.</p>
+                    <div className="text-center py-32 bg-surface rounded-lg border border-borderColor border-dashed">
+                        <Clock className="w-12 h-12 text-textMuted mx-auto mb-6 opacity-20" />
+                        <p className="text-lg font-medium text-textMuted">no records found.</p>
+                        <p className="text-xs text-textMuted mt-1 italic uppercase tracking-widest">completed pickups will appear here</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {locations.map((item) => (
-                            <div key={item._id} className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10 overflow-hidden group flex flex-col h-full hover:border-neonGreen/30 transition-all duration-300">
-                                <div className="p-6 flex-grow relative">
-                                    <div className="absolute top-4 right-4 bg-neonGreen/10 border border-neonGreen/30 text-neonGreen px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 shadow-sm">
-                                        <div className="w-2 h-2 rounded-full bg-neonGreen animate-pulse"></div>
-                                        Collected
-                                    </div>
-                                    <div className="flex items-start justify-between mb-4 mt-2">
-                                        <div className="bg-white/5 p-2 rounded-xl text-textMuted border border-white/10">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <div key={item._id} className="bg-surface border border-borderColor rounded-lg overflow-hidden flex flex-col hover:bg-white transition-all duration-150">
+                                <div className="p-8 flex-grow">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="w-10 h-10 bg-green-50 border border-green-100 rounded flex items-center justify-center text-secondary">
+                                            <CheckCircle className="w-5 h-5" />
+                                        </div>
+                                        <div className="badge-empty flex items-center gap-1.5 border-none bg-green-100/50">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                                            collected
                                         </div>
                                     </div>
-                                    <h3 className="text-lg font-bold text-textPrimary mb-2 line-clamp-2" title={item.address}>{item.address}</h3>
-                                    <p className="text-textMuted text-sm mb-4">{item.city} - {item.pincode}</p>
+                                    <h3 className="text-lg font-semibold text-textPrimary mb-2 leading-snug">{item.address}</h3>
+                                    <p className="text-sm text-textMuted mb-6 italic">{item.city} - {item.pincode}</p>
                                     
                                     {item.assigned_driver && session?.user?.role === 'admin' && (
-                                        <p className="text-sm font-bold text-neonGreen bg-neonGreen/10 inline-block px-3 py-1 rounded-xl border border-neonGreen/30">Collected by: {item.assigned_driver}</p>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded text-[10px] font-medium text-primary uppercase tracking-wider">
+                                            driver: {item.assigned_driver}
+                                        </div>
                                     )}
                                 </div>
-                                
-                                <div className="px-6 py-4 bg-black/20 border-t border-white/10 flex flex-wrap gap-2 mt-auto">
+
+                                <div className="p-6 bg-white border-t border-borderColor">
                                     <Link
                                         href={item.geolocation.latitude && item.geolocation.longitude ? `https://www.google.com/maps/search/?api=1&query=${item.geolocation.latitude},${item.geolocation.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.address}, ${item.city}, ${item.pincode}`)}`}
                                         target="_blank"
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-black/30 border border-electricBlue/40 text-electricBlue font-medium hover:bg-electricBlue/10 transition-all text-sm shadow-sm"
+                                        className="btn-secondary w-full flex items-center justify-center gap-2 text-xs py-2.5"
                                     >
-                                        <span>View Map</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        <span>view site map</span>
+                                        <ExternalLink className="w-3 h-3" />
                                     </Link>
                                 </div>
                             </div>
@@ -145,6 +141,28 @@ export default function CollectedPage() {
                     </div>
                 )}
             </main>
+
+            <footer className="bg-primary pt-24 pb-16 mt-20">
+                <div className="max-w-[1280px] mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
+                        <div className="flex items-center gap-3">
+                            <Trash2 className="w-5 h-5 text-secondary" />
+                            <span className="text-xl font-semibold text-white tracking-tight italic">EcoTrack</span>
+                        </div>
+                        <div className="flex items-center gap-10">
+                            <Link href="/" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">home</Link>
+                            <Link href="/collect" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">bins map</Link>
+                            <Link href="/complaints" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">complaints</Link>
+                        </div>
+                        <div className="text-xs text-secondary font-medium italic">
+                            &copy; 2026. all rights reserved.
+                        </div>
+                    </div>
+                    <div className="flex justify-center pt-12 border-t border-white/10">
+                        <p className="text-[10px] text-white/40 tracking-[0.4em] uppercase font-bold">built for smart city waste logistics</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

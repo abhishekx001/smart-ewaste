@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { AlertCircle, Camera, MapPin, ChevronLeft, CheckCircle2, Loader2, Send } from 'lucide-react';
 
 export default function SubmitComplaintPage() {
     const { data: session, status } = useSession();
@@ -26,7 +27,7 @@ export default function SubmitComplaintPage() {
         setLoadingLocation(true);
         setLocationError('');
         if (!navigator.geolocation) {
-            setLocationError('Geolocation is not supported by your browser');
+            setLocationError('geolocation not supported');
             setLoadingLocation(false);
             return;
         }
@@ -37,7 +38,7 @@ export default function SubmitComplaintPage() {
                 setLoadingLocation(false);
             },
             () => {
-                setLocationError('Unable to retrieve your location');
+                setLocationError('unable to retrieve location');
                 setLoadingLocation(false);
             }
         );
@@ -47,50 +48,20 @@ export default function SubmitComplaintPage() {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImageBase64(reader.result);
-            };
+            reader.onloadend = () => setImageBase64(reader.result);
             reader.readAsDataURL(file);
         }
     };
 
-    if (status === 'loading') {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen"></div>
-            </div>
-        );
-    }
-
-    if (status === 'unauthenticated' || session?.user?.role !== 'user') {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-danger/30 text-center animate-fade-in-up">
-                    <h1 className="text-2xl font-bold text-danger mb-4">Access Denied</h1>
-                    <p className="text-textMuted mb-6">
-                        You must be logged in as a registered user to submit complaints.
-                    </p>
-                    <Link href="/login" className="block w-full py-3 px-4 bg-neonGreen text-black font-bold rounded-xl transition-all hover:scale-105 hover:shadow-[0_0_20px_#00FF88]">
-                        Go to Login
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         setMessage({ type: '', text: '' });
-
         try {
             const res = await fetch('/api/complaints', {
                 method: 'POST',
@@ -103,143 +74,161 @@ export default function SubmitComplaintPage() {
                     ...formData
                 })
             });
-
-            const data = await res.json();
-
             if (res.ok) {
-                setMessage({ type: 'success', text: 'Complaint submitted successfully!' });
-                setFormData({
-                    userDetails: '',
-                    binLocation: '',
-                    description: ''
-                });
-                setLatitude('');
-                setLongitude('');
-                setImageBase64('');
-                setTimeout(() => {
-                    router.push('/complaints');
-                }, 2000);
+                setMessage({ type: 'success', text: 'complaint submitted successfully!' });
+                setFormData({ userDetails: '', binLocation: '', description: '' });
+                setLatitude(''); setLongitude(''); setImageBase64('');
+                setTimeout(() => router.push('/complaints'), 2000);
             } else {
-                setMessage({ type: 'error', text: data.message || 'Submission failed' });
+                setMessage({ type: 'error', text: 'submission failed' });
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'An unexpected error occurred' });
+            setMessage({ type: 'error', text: 'an unexpected error occurred' });
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    return (
-        <div className="min-h-screen bg-appBg font-sans text-textPrimary relative overflow-hidden">
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-electricBlue/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-neonGreen/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
+    if (status === 'loading') {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
-            <header className="py-12 mb-8 relative z-10 animate-fade-in-up border-b border-white/10">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-                    <h1 className="text-4xl font-extrabold text-textPrimary mb-2">
-                        Submit <span className="text-transparent bg-clip-text bg-gradient-to-r from-electricBlue to-neonGreen">Complaint</span>
-                    </h1>
-                    <p className="text-lg text-textMuted">Report issues with bins or waste collection in your area.</p>
+    if (status === 'unauthenticated' || session?.user?.role !== 'user') {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
+                <div className="max-w-md w-full bg-red-50 p-10 rounded-lg border border-red-100 text-center">
+                    <AlertCircle className="w-12 h-12 text-danger mx-auto mb-6" />
+                    <h1 className="text-xl font-semibold text-danger mb-2">access denied</h1>
+                    <p className="text-sm text-red-600/70 mb-8">you must be logged in as a registered user to submit complaints.</p>
+                    <Link href="/login" className="btn-secondary inline-block w-full text-center">go to login portal</Link>
                 </div>
-            </header>
+            </div>
+        );
+    }
 
-            <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 relative z-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <div className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10 p-8">
-                    {message.text && (
-                        <div className={`mb-6 p-4 rounded-xl font-medium text-center border ${message.type === 'success' ? 'bg-neonGreen/10 text-neonGreen border-neonGreen/30' : 'bg-danger/10 text-danger border-danger/30'}`}>
-                            {message.text}
-                        </div>
-                    )}
+    return (
+        <div className="min-h-screen bg-white font-poppins text-textPrimary py-12 px-6">
+            <div className="max-w-2xl mx-auto">
+                <div className="mb-12">
+                    <Link href="/" className="inline-flex items-center gap-2 text-xs font-medium text-textMuted hover:text-primary transition-colors mb-6 italic">
+                        <ChevronLeft className="w-3 h-3" /> back to home
+                    </Link>
+                    <h1 className="text-3xl font-semibold tracking-tight uppercase italic text-textPrimary">
+                        report <span className="text-primary italic">incident</span>
+                    </h1>
+                    <p className="text-sm text-textMuted mt-1">document and report overflow or damage to the city audit team</p>
+                </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label htmlFor="userDetails" className="block text-sm font-bold text-textMuted">Your Details</label>
-                            <input
-                                type="text"
-                                id="userDetails"
-                                name="userDetails"
-                                className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none bg-black/30 text-white"
-                                placeholder="Your Name and Contact Information"
-                                value={formData.userDetails}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                <div className="bg-white border border-borderColor rounded-lg p-10">
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {message.text && (
+                            <div className={`p-4 rounded-lg text-center text-xs font-medium border ${
+                                message.type === 'success' ? 'bg-green-50 border-green-100 text-primary' : 'bg-red-50 border-red-100 text-danger'
+                            }`}>
+                                {message.text}
+                            </div>
+                        )}
 
-                        <div className="space-y-2">
-                            <label htmlFor="binLocation" className="block text-sm font-bold text-textMuted">Bin Location</label>
-                            <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="label-sm">reporter identity</label>
                                 <input
                                     type="text"
-                                    id="binLocation"
-                                    name="binLocation"
-                                    className="flex-grow px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none bg-black/30 text-white"
-                                    placeholder="Where is the bin? (e.g. 1st Main Rd)"
-                                    value={formData.binLocation}
+                                    name="userDetails"
+                                    className="input-field"
+                                    placeholder="your name and contact info..."
+                                    value={formData.userDetails}
                                     onChange={handleChange}
                                     required
                                 />
-                                <button
-                                    type="button"
-                                    className="px-4 py-3 border border-electricBlue/40 text-electricBlue hover:bg-electricBlue/10 font-bold rounded-xl whitespace-nowrap shadow-sm transition-all text-sm"
-                                    onClick={getLocation}
-                                    disabled={loadingLocation}
-                                >
-                                    {loadingLocation ? "Getting..." : "Get Location"}
-                                </button>
                             </div>
-                            {locationError && <p className="text-danger text-xs mt-1">{locationError}</p>}
-                            {(latitude || longitude) && (
-                                <p className="text-neonGreen text-xs mt-1 font-mono font-medium">Location attached: Lat {latitude}, Lng {longitude}</p>
-                            )}
-                        </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="image" className="block text-sm font-bold text-textMuted">Upload Image (Optional)</label>
-                            <input
-                                type="file"
-                                id="image"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/30 text-textMuted text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-neonGreen/10 file:text-neonGreen hover:file:bg-neonGreen/20 transition-all cursor-pointer outline-none focus:ring-2 focus:ring-neonGreen"
-                            />
-                            {imageBase64 && (
-                                <div className="mt-3 h-40 w-40 relative rounded-xl overflow-hidden border shadow-sm border-white/10">
-                                    <img src={imageBase64} alt="Preview" className="object-cover w-full h-full" />
+                            <div className="space-y-2">
+                                <label className="label-sm">incident location</label>
+                                <div className="flex gap-4">
+                                    <input
+                                        type="text"
+                                        name="binLocation"
+                                        className="input-field flex-grow"
+                                        placeholder="specific bin area or street..."
+                                        value={formData.binLocation}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={getLocation}
+                                        disabled={loadingLocation}
+                                        className="btn-secondary whitespace-nowrap text-xs border-secondary/20 text-secondary"
+                                    >
+                                        {loadingLocation ? <Loader2 className="w-3 h-3 animate-spin" /> : 'pin location'}
+                                    </button>
                                 </div>
-                            )}
+                                {locationError && <p className="text-[10px] text-danger italic mt-1">{locationError}</p>}
+                                {(latitude || longitude) && (
+                                    <p className="text-[10px] text-secondary italic mt-1 px-2 border-l border-secondary">
+                                        gps coordinates attached: {latitude}, {longitude}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="label-sm">visual evidence (optional)</label>
+                                <div className="flex flex-col gap-4">
+                                    <div className="relative group overflow-hidden">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <div className="btn-secondary w-full py-4 flex items-center justify-center gap-2 italic">
+                                            <Camera className="w-4 h-4" />
+                                            {imageBase64 ? 'change evidence image' : 'upload photo evidence'}
+                                        </div>
+                                    </div>
+                                    {imageBase64 && (
+                                        <div className="h-48 w-full relative rounded-sm overflow-hidden border border-borderColor bg-surface">
+                                            <img src={imageBase64} alt="Evidence" className="object-cover w-full h-full" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="label-sm">incident description</label>
+                                <textarea
+                                    name="description"
+                                    rows="5"
+                                    className="input-field min-h-[120px] resize-none"
+                                    placeholder="describe the issue in detail (overflowing, damaged, missing, etc)..."
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="description" className="block text-sm font-bold text-textMuted">Complaint Description</label>
-                            <textarea
-                                id="description"
-                                name="description"
-                                rows="5"
-                                className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none resize-none bg-black/30 text-white"
-                                placeholder="Describe the issue with the bin (e.g. Overflowing, Damaged, Not collected for days...)"
-                                value={formData.description}
-                                onChange={handleChange}
-                                required
-                            ></textarea>
+                        <div className="pt-4 flex flex-col gap-4">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full btn-primary py-4 flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                {isSubmitting ? 'submitting report...' : 'dispatch complaint'}
+                            </button>
+                            <Link href="/complaints" className="btn-secondary w-full text-center py-4 text-xs italic">
+                                cancel and view records
+                            </Link>
                         </div>
-
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`w-full py-4 rounded-xl bg-neonGreen text-black font-bold text-lg transition-all hover:scale-105 hover:shadow-[0_0_20px_#00FF88] ${isSubmitting ? 'opacity-70 cursor-not-allowed hidden-shadow' : ''}`}
-                        >
-                            {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
-                        </button>
                     </form>
-                    
-                    <div className="mt-6 text-center">
-                        <Link href="/complaints" className="text-textMuted hover:text-textPrimary font-medium transition-colors">
-                            View My Past Complaints
-                        </Link>
-                    </div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }
