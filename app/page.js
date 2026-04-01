@@ -14,13 +14,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen relative font-sans flex flex-col">
+    <div className="min-h-screen relative font-sans flex flex-col bg-appBg text-textPrimary animate-fade-in-up">
       {/* Global Background Image */}
-      <div className="absolute inset-0 bg-[url('/img1.webp')] bg-cover bg-center -z-20 fixed"></div>
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm -z-10 fixed"></div>
+      <div className="absolute inset-0 bg-[url('/img1.webp')] bg-cover bg-center -z-20 fixed opacity-20"></div>
+      <div className="absolute inset-0 bg-appBg/90 backdrop-blur-sm -z-10 fixed"></div>
 
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300 font-montserrat">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/5 backdrop-blur-md border-b border-white/10 shadow-xl transition-all duration-300 font-montserrat">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-3 group">
@@ -33,7 +33,7 @@ export default function Home() {
                   priority
                 />
               </div>
-              <span className="text-2xl font-bold text-green-700 font-oswald tracking-wide">
+              <span className="text-2xl font-bold text-neonGreen font-oswald tracking-wide">
                 eWaste
               </span>
             </Link>
@@ -44,48 +44,48 @@ export default function Home() {
                 <>
                   {session?.user?.role === 'admin' && (
                     <>
-                      <Link href="/add" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/add" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Add Location
                       </Link>
-                      <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/collect" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Collection Points
                       </Link>
-                      <Link href="/collected" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/collected" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Collected Bins
                       </Link>
-                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/complaints" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Manage Complaints
                       </Link>
                     </>
                   )}
                   {session?.user?.role === 'driver' && (
                     <>
-                      <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/collect" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Collection Points
                       </Link>
-                      <Link href="/collected" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/collected" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Collected Bins
                       </Link>
-                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/complaints" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         My Dispatches
                       </Link>
                     </>
                   )}
                   {session?.user?.role === 'user' && (
                     <>
-                      <Link href="/complaints/new" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/complaints/new" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         Submit Complaint
                       </Link>
-                      <Link href="/complaints" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                      <Link href="/complaints" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                         My Complaints
                       </Link>
                     </>
                   )}
-                  <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
-                    <span className="text-sm text-gray-700">Hi, <span className="font-semibold text-gray-900">{session?.user?.name || 'User'}</span></span>
+                  <div className="flex items-center gap-4 pl-4 border-l border-white/10">
+                    <span className="text-sm text-textMuted">Hi, <span className="font-semibold text-textPrimary">{session?.user?.name || 'User'}</span></span>
                     <button
                       onClick={() => signOut({ callbackUrl: '/' })}
-                      className="px-4 py-2 rounded-full bg-red-100/80 text-red-700 hover:bg-red-200/80 font-medium transition-all text-sm"
+                      className="px-4 py-2 rounded-xl bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30 font-medium transition-all text-sm"
                     >
                       Logout
                     </button>
@@ -93,13 +93,13 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <Link href="/add" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                  <Link href="/add" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                     Add Location
                   </Link>
-                  <Link href="/collect" className="text-gray-800 hover:text-green-700 font-medium transition-colors">
+                  <Link href="/collect" className="text-textPrimary hover:text-neonGreen font-medium transition-colors">
                     Collection Points
                   </Link>
-                  <Link href="/login" className="px-5 py-2.5 rounded-full bg-green-700 text-white font-medium hover:bg-green-800 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                  <Link href="/login" className="px-5 py-2.5 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-medium">
                     Login
                   </Link>
                 </>
@@ -108,7 +108,7 @@ export default function Home() {
 
             {/* Mobile Toggle Button */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-800 hover:bg-white/50 transition-colors"
+              className="md:hidden p-2 rounded-md text-textPrimary hover:bg-white/10 transition-colors"
               onClick={toggleSidebar}
               aria-label="Toggle Menu"
             >
@@ -124,11 +124,11 @@ export default function Home() {
 
       {/* Full Page Sidebar */}
       <div className={`fixed inset-0 z-[60] transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out md:hidden`}>
-        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={toggleSidebar}></div>
-        <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-2xl p-6 flex flex-col">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={toggleSidebar}></div>
+        <div className="absolute right-0 top-0 bottom-0 w-64 bg-appBg border-l border-white/10 shadow-2xl p-6 flex flex-col">
           <div className="flex justify-end mb-8">
             <button
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+              className="p-2 rounded-full hover:bg-white/10 text-textMuted transition-colors"
               onClick={toggleSidebar}
               aria-label="Close Menu"
             >
@@ -142,45 +142,45 @@ export default function Home() {
           <div className="flex flex-col gap-6">
             {status === 'authenticated' ? (
               <>
-                <div className="pb-4 border-b border-gray-100">
-                  <p className="text-sm text-gray-500">Signed in as</p>
-                  <p className="font-semibold text-gray-900 text-lg">{session?.user?.name || 'User'}</p>
+                <div className="pb-4 border-b border-white/10">
+                  <p className="text-sm text-textMuted">Signed in as</p>
+                  <p className="font-semibold text-textPrimary text-lg">{session?.user?.name || 'User'}</p>
                 </div>
                 {session?.user?.role === 'admin' && (
                   <>
-                    <Link href="/add" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/add" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Add Location
                     </Link>
-                    <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/collect" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Collection Points
                     </Link>
-                    <Link href="/collected" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/collected" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Collected Bins
                     </Link>
-                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/complaints" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Manage Complaints
                     </Link>
                   </>
                 )}
                 {session?.user?.role === 'driver' && (
                   <>
-                    <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/collect" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Collection Points
                     </Link>
-                    <Link href="/collected" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/collected" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Collected Bins
                     </Link>
-                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/complaints" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       My Dispatches
                     </Link>
                   </>
                 )}
                 {session?.user?.role === 'user' && (
                   <>
-                    <Link href="/complaints/new" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/complaints/new" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       Submit Complaint
                     </Link>
-                    <Link href="/complaints" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                    <Link href="/complaints" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                       My Complaints
                     </Link>
                   </>
@@ -190,20 +190,20 @@ export default function Home() {
                     toggleSidebar();
                     signOut({ callbackUrl: '/' });
                   }}
-                  className="mt-auto w-full py-3 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors text-center"
+                  className="mt-auto w-full py-3 rounded-xl bg-danger/20 text-danger border border-danger/30 font-medium hover:bg-danger/30 transition-colors text-center"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link href="/add" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                <Link href="/add" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                   Add Location
                 </Link>
-                <Link href="/collect" className="text-xl font-medium text-gray-800 hover:text-green-600 transition-colors" onClick={toggleSidebar}>
+                <Link href="/collect" className="text-xl font-medium text-textPrimary hover:text-neonGreen transition-colors" onClick={toggleSidebar}>
                   Collection Points
                 </Link>
-                <Link href="/login" className="w-full py-3 rounded-xl bg-green-600 text-white font-bold text-center hover:bg-green-700 shadow-lg transition-transform active:scale-95" onClick={toggleSidebar}>
+                <Link href="/login" className="w-full py-3 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-bold text-center" onClick={toggleSidebar}>
                   Login
                 </Link>
               </>
@@ -215,18 +215,18 @@ export default function Home() {
       {/* Hero Section */}
       <main className="flex-grow flex items-center justify-center relative overflow-hidden pt-16">
         {/* Animated blobs */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-green-300/30 rounded-full blur-3xl mix-blend-multiply animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/30 rounded-full blur-3xl mix-blend-multiply animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-20 left-10 w-96 h-96 bg-neonGreen/10 rounded-full blur-[100px] mix-blend-screen animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-electricBlue/10 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-        <div className="max-w-4xl mx-auto px-4 text-center z-10 py-20">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-white/50 backdrop-blur border border-green-100 text-green-700 text-sm font-semibold tracking-wide uppercase mb-6 shadow-sm font-montserrat">
+        <div className="max-w-4xl mx-auto px-4 text-center z-10 py-20 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl m-4 mt-8">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-white/5 backdrop-blur border border-neonGreen/30 text-neonGreen text-sm font-semibold tracking-wide uppercase mb-6 shadow-sm font-montserrat">
             Sustainable Future
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight mb-8 leading-tight font-raleway">
+          <h1 className="text-5xl md:text-7xl font-bold text-textPrimary tracking-tight mb-8 leading-tight font-raleway">
             A Smarter Way to <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500">Manage City Waste</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonGreen to-electricBlue">Manage City Waste</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed font-montserrat">
+          <p className="text-xl text-textMuted mb-10 max-w-2xl mx-auto leading-relaxed font-montserrat">
             Join our mission to create cleaner, greener cities through efficient waste collection and smart geolocation monitoring systems.
           </p>
 
@@ -234,36 +234,36 @@ export default function Home() {
             {status === 'authenticated' ? (
               session?.user?.role === 'admin' ? (
                 <>
-                  <Link href="/add" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                  <Link href="/add" className="w-full sm:w-auto px-8 py-4 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-bold text-lg">
                     Register Location
                   </Link>
-                  <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                  <Link href="/collect" className="w-full sm:w-auto px-8 py-4 border border-neonGreen/40 text-neonGreen rounded-xl hover:bg-neonGreen/10 transition-all font-bold text-lg">
                     View Points
                   </Link>
-                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-amber-500 text-white font-bold text-lg shadow-lg shadow-amber-200 hover:shadow-xl hover:bg-amber-600 transition-all transform hover:-translate-y-1">
+                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 bg-warning/20 text-warning border border-warning/30 rounded-xl hover:bg-warning/30 transition-all font-bold text-lg">
                     Complaints
                   </Link>
                 </>
               ) : session?.user?.role === 'user' ? (
                 <>
-                  <Link href="/complaints/new" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                  <Link href="/complaints/new" className="w-full sm:w-auto px-8 py-4 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-bold text-lg">
                     Submit Complaint
                   </Link>
-                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                  <Link href="/complaints" className="w-full sm:w-auto px-8 py-4 border border-neonGreen/40 text-neonGreen rounded-xl hover:bg-neonGreen/10 transition-all font-bold text-lg">
                     View My Complaints
                   </Link>
                 </>
               ) : (
-                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-bold text-lg">
                   View Collection Points
                 </Link>
               )
             ) : (
               <>
-                <Link href="/login" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-700 transition-all transform hover:-translate-y-1">
+                <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-neonGreen text-black rounded-xl hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all font-bold text-lg">
                   Get Started
                 </Link>
-                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-gray-800 font-bold text-lg border border-gray-200 shadow-md hover:shadow-lg hover:border-green-200 hover:text-green-600 transition-all transform hover:-translate-y-1">
+                <Link href="/collect" className="w-full sm:w-auto px-8 py-4 border border-neonGreen/40 text-neonGreen rounded-xl hover:bg-neonGreen/10 transition-all font-bold text-lg">
                   View Map
                 </Link>
               </>

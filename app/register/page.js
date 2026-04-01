@@ -76,29 +76,33 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-appBg px-4 py-8 font-sans relative overflow-hidden text-textPrimary animate-fade-in-up">
             {/* Background Image */}
-            <div className="absolute inset-0 bg-[url('/img2.webp')] bg-cover bg-center -z-10"></div>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10"></div>
+            <div className="absolute inset-0 bg-[url('/img2.webp')] bg-cover bg-center -z-10 opacity-20"></div>
+            <div className="absolute inset-0 bg-appBg/90 backdrop-blur-sm -z-10"></div>
 
-            <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden z-10 transition-all duration-300 hover:shadow-green-900/20">
-                <div className="bg-green-600 p-8 text-center relative overflow-hidden">
-                    <h1 className="text-3xl font-extrabold text-white mb-2 relative z-10 font-oswald tracking-wide">
-                        Create <span className="opacity-90 font-light">Account</span>
+            {/* Glowing blobs */}
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neonGreen/10 rounded-full blur-[100px] mix-blend-screen animate-pulse pointer-events-none"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-electricBlue/10 rounded-full blur-[100px] mix-blend-screen animate-pulse pointer-events-none" style={{ animationDelay: '1s' }}></div>
+
+            <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden z-10 border border-white/10 transition-all duration-300 hover:border-neonGreen/30 hover:shadow-[0_0_40px_rgba(0,255,136,0.1)]">
+                <div className="bg-black/40 p-8 text-center relative overflow-hidden border-b border-white/10">
+                    <h1 className="text-3xl font-extrabold text-textPrimary mb-2 relative z-10 font-oswald tracking-wide">
+                        Create <span className="opacity-90 font-light text-neonGreen">Account</span>
                     </h1>
-                    <p className="text-green-100/90 text-sm">Register as a user to submit complaints</p>
+                    <p className="text-textMuted text-sm">Register as a user to submit complaints</p>
                 </div>
 
                 <div className="p-8">
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
+                        <div className="mb-6 p-4 bg-danger/10 border-l-4 border-danger text-danger text-sm rounded-xl">
                             <p className="font-bold">Error</p>
                             <p>{error}</p>
                         </div>
                     )}
                     
                     {success && (
-                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm rounded">
+                        <div className="mb-6 p-4 bg-neonGreen/10 border-l-4 border-neonGreen text-neonGreen text-sm rounded-xl">
                             <p className="font-bold">Success</p>
                             <p>{success}</p>
                         </div>
@@ -106,12 +110,12 @@ export default function RegisterPage() {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div className="space-y-2">
-                            <label htmlFor="userId" className="block text-sm font-bold text-gray-700">User ID</label>
+                            <label htmlFor="userId" className="block text-sm font-bold text-textMuted">User ID</label>
                             <input
                                 type="text"
                                 id="userId"
                                 name="userId"
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none bg-gray-50 focus:bg-white"
+                                className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none bg-black/30 text-white"
                                 placeholder="Choose a user ID"
                                 value={formData.userId}
                                 onChange={handleChange}
@@ -120,12 +124,12 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="block text-sm font-bold text-gray-700">Password</label>
+                            <label htmlFor="password" className="block text-sm font-bold text-textMuted">Password</label>
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none bg-gray-50 focus:bg-white"
+                                className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none bg-black/30 text-white"
                                 placeholder="Create a password"
                                 value={formData.password}
                                 onChange={handleChange}
@@ -134,12 +138,12 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700">Confirm Password</label>
+                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-textMuted">Confirm Password</label>
                             <input
                                 type="password"
                                 id="confirmPassword"
                                 name="confirmPassword"
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none bg-gray-50 focus:bg-white"
+                                className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-neonGreen focus:outline-none transition-all outline-none bg-black/30 text-white"
                                 placeholder="Confirm your password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
@@ -150,20 +154,20 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full py-3.5 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "transform hover:-translate-y-0.5"}`}
+                            className={`w-full py-4 px-4 bg-neonGreen text-black font-bold rounded-xl shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed hidden-shadow" : "hover:scale-105 hover:shadow-[0_0_20px_#00FF88]"}`}
                         >
                             {isLoading ? "Creating Account..." : "Register"}
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center text-sm text-gray-500 flex flex-col space-y-2">
+                    <div className="mt-8 text-center text-sm text-textMuted flex flex-col space-y-3">
                         <span>
                             Already have an account?{' '}
-                            <Link href="/login" className="text-green-600 hover:text-green-700 font-semibold transition-colors">
+                            <Link href="/login" className="text-neonGreen hover:text-white font-semibold transition-colors">
                                 Login here
                             </Link>
                         </span>
-                        <Link href="/" className="hover:text-green-600 transition-colors">
+                        <Link href="/" className="hover:text-neonGreen transition-colors">
                             Back to Home
                         </Link>
                     </div>

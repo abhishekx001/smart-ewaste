@@ -6,16 +6,19 @@ export async function POST(request) {
         console.log("Request received");
         const { address, pincode, city, latitude, longitude } = await request.json();
 
-        if (!address || !pincode || !city || !latitude || !longitude) {
+        if (!address || !pincode || !city) {
             return NextResponse.json(
-                { message: "All fields sent data are required" },
+                { message: "Address, Pincode, and City are required fields" },
                 { status: 400 }
             );
         }
 
+        const exactLat = latitude || '';
+        const exactLng = longitude || '';
+
         const { error } = await supabase
             .from('locations')
-            .insert({ address, pincode, city, latitude, longitude });
+            .insert({ address, pincode, city, latitude: exactLat, longitude: exactLng });
 
         if (error) {
             throw error;
@@ -134,14 +137,17 @@ export async function PUT(request) {
             return NextResponse.json({ message: "Location ID required" }, { status: 400 });
         }
 
+        const exactLat = latitude || '';
+        const exactLng = longitude || '';
+
         const { data: updatedLocation, error } = await supabase
             .from('locations')
             .update({
                 address,
                 city,
                 pincode,
-                latitude,
-                longitude
+                latitude: exactLat,
+                longitude: exactLng
             })
             .eq('id', id)
             .select() // Return the updated record

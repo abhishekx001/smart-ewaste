@@ -43,21 +43,21 @@ export default function ComplaintsPage() {
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <div className="min-h-screen flex items-center justify-center bg-appBg">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen"></div>
             </div>
         );
     }
 
     if (status === 'unauthenticated' || !['user', 'admin', 'driver'].includes(session?.user?.role)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border-t-4 border-red-500">
-                    <h1 className="text-2xl font-bold text-red-600 mb-4 text-center">Access Denied</h1>
-                    <p className="text-gray-600 text-center mb-6">
+            <div className="min-h-screen flex items-center justify-center bg-appBg px-4">
+                <div className="max-w-md w-full bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-danger/30">
+                    <h1 className="text-2xl font-bold text-danger mb-4 text-center">Access Denied</h1>
+                    <p className="text-textMuted text-center mb-6">
                         You must be logged in to view complaints.
                     </p>
-                    <Link href="/login" className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-center font-bold rounded-xl transition-colors shadow-md">
+                    <Link href="/login" className="block w-full py-3 px-4 bg-danger/20 text-danger border border-danger/30 text-center font-bold rounded-xl hover:bg-danger/30 transition-all">
                         Go to Login
                     </Link>
                 </div>
@@ -106,21 +106,22 @@ export default function ComplaintsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
-            <header className="bg-white border-b border-gray-200 py-12 mb-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-6">
+        <div className="min-h-screen bg-appBg font-sans text-textPrimary">
+            <header className="bg-appBg border-b border-white/10 py-12 mb-8 relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-64 h-64 bg-neonGreen/10 rounded-full blur-[80px] mix-blend-screen pointer-events-none"></div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-6 relative z-10 animate-fade-in-up">
                     <div>
-                        <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                        <h1 className="text-4xl font-extrabold text-textPrimary mb-2 tracking-tight">
                             {session?.user?.role === 'admin' ? 'All ' : session?.user?.role === 'driver' ? 'Dispatched ' : 'My '}
-                            <span className="text-green-600">Complaints</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonGreen to-electricBlue">Complaints</span>
                         </h1>
-                        <p className="text-lg text-gray-500 max-w-2xl">
+                        <p className="text-lg text-textMuted max-w-2xl">
                             {session?.user?.role === 'admin' ? 'Manage and update reported issues.' : 'Track the status of your past reports.'}
                         </p>
                     </div>
                     {session?.user?.role === 'user' && (
                         <div>
-                            <Link href="/complaints/new" className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl shadow-md hover:bg-green-700 transition-colors inline-block">
+                            <Link href="/complaints/new" className="px-6 py-3 bg-neonGreen text-black font-bold rounded-xl shadow-md hover:scale-105 hover:shadow-[0_0_20px_#00FF88] transition-all inline-block">
                                 + New Complaint
                             </Link>
                         </div>
@@ -128,56 +129,62 @@ export default function ComplaintsPage() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 {loadingData ? (
                     <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
-                        <p className="text-gray-500">Loading your complaints...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neonGreen mb-4"></div>
+                        <p className="text-textMuted">Loading your complaints...</p>
                     </div>
                 ) : error ? (
-                    <div className="text-center py-16 bg-red-50 rounded-2xl border border-red-100">
-                        <p className="text-red-500 font-semibold">{error}</p>
+                    <div className="text-center py-16 bg-danger/10 rounded-2xl border border-danger/30">
+                        <p className="text-danger font-semibold">{error}</p>
                     </div>
                 ) : complaints.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4 text-gray-400">
+                    <div className="text-center py-20 bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 mb-4 text-textMuted">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         </div>
-                        <p className="text-xl text-gray-500 font-medium">No complaints found.</p>
-                        <p className="text-gray-400 mt-2">You haven't reported any issues yet.</p>
+                        <p className="text-xl text-textMuted font-medium">No complaints found.</p>
+                        <p className="text-textMuted/70 mt-2">You haven't reported any issues yet.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {complaints.map((item) => (
-                            <div key={item.id} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 p-6 flex flex-col">
+                            <div key={item.id} className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl border border-white/10 p-6 flex flex-col hover:border-neonGreen/30 transition-all duration-300">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide ${
-                                        item.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                                        item.status === 'assigned' ? 'bg-purple-100 text-purple-700' :
-                                        item.status === 'approved' ? 'bg-amber-100 text-amber-700' :
-                                        'bg-blue-100 text-blue-700'
+                                    <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide border ${
+                                        item.status === 'resolved' ? 'bg-neonGreen/10 text-neonGreen border-neonGreen/30' :
+                                        item.status === 'assigned' ? 'bg-electricBlue/10 text-electricBlue border-electricBlue/30' :
+                                        item.status === 'approved' ? 'bg-warning/10 text-warning border-warning/30' :
+                                        'bg-white/10 text-textMuted border-white/20'
                                     }`}>
+                                        <div className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                                            item.status === 'resolved' ? 'bg-neonGreen animate-pulse' :
+                                            item.status === 'assigned' ? 'bg-electricBlue animate-pulse' :
+                                            item.status === 'approved' ? 'bg-warning animate-pulse' :
+                                            'bg-textMuted animate-pulse'
+                                        }`}></div>
                                         {item.status || 'Pending'}
                                     </span>
-                                    <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                    <span className="text-xs text-textMuted font-medium whitespace-nowrap">
                                         {new Date(item.created_at).toLocaleDateString()}
                                     </span>
                                 </div>
                                 
                                 {session?.user?.role === 'admin' && (
-                                    <p className="text-xs text-gray-400 mb-2 font-mono">Reported by: {item.user_details}</p>
+                                    <p className="text-xs text-textMuted/70 mb-2 font-mono">Reported by: {item.user_details}</p>
                                 )}
                                 {item.assigned_driver && session?.user?.role === 'admin' && (
-                                    <p className="text-xs text-purple-600 font-bold mb-2">Assigned to: {item.assigned_driver}</p>
+                                    <p className="text-xs text-electricBlue font-bold mb-2">Assigned to: {item.assigned_driver}</p>
                                 )}
                                 
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{item.bin_location}</h3>
-                                <p className="text-gray-600 text-sm flex-grow bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <h3 className="text-lg font-bold text-textPrimary mb-2">{item.bin_location}</h3>
+                                <p className="text-textMuted text-sm flex-grow bg-black/30 p-3 rounded-xl border border-white/10">
                                     {item.description}
                                 </p>
                                 
                                 {item.image_data && (
-                                    <div className="mt-4 w-full h-40 relative rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                                    <div className="mt-4 w-full h-40 relative rounded-xl overflow-hidden border border-white/10 shadow-sm">
                                         <img src={item.image_data} alt="Complaint Evidence" className="object-cover w-full h-full hover:scale-105 transition-transform duration-300" />
                                     </div>
                                 )}
@@ -187,7 +194,7 @@ export default function ComplaintsPage() {
                                         <Link
                                             href={`https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`}
                                             target="_blank"
-                                            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-semibold hover:bg-blue-100 transition-colors text-sm shadow-sm"
+                                            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-electricBlue/10 border border-electricBlue/30 text-electricBlue font-semibold hover:bg-electricBlue/20 transition-all text-sm shadow-sm"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                             View Pinned Location
@@ -196,30 +203,30 @@ export default function ComplaintsPage() {
                                 )}
                                 
                                 {session?.user?.role === 'admin' && (
-                                    <div className="mt-4 pt-4 border-t border-gray-100">
+                                    <div className="mt-4 pt-4 border-t border-white/10">
                                         {solvingId === item.id ? (
                                             <div className="flex flex-col gap-3">
-                                                <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">Select Driver</p>
+                                                <p className="text-xs font-bold text-textMuted uppercase tracking-wide">Select Driver</p>
                                                 <select 
                                                     value={selectedDriver} 
                                                     onChange={(e) => setSelectedDriver(e.target.value)}
-                                                    className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500 font-semibold cursor-pointer text-gray-700"
+                                                    className="w-full p-2.5 bg-black/30 border border-white/10 rounded-xl text-sm text-textPrimary outline-none focus:ring-2 focus:ring-neonGreen font-semibold cursor-pointer"
                                                 >
-                                                    <option value="" disabled>--- Available Drivers ---</option>
+                                                    <option value="" disabled className="bg-appBg">--- Available Drivers ---</option>
                                                     {drivers.map(d => (
-                                                        <option key={d.user_id} value={d.user_id}>{d.user_id}</option>
+                                                        <option key={d.user_id} value={d.user_id} className="bg-appBg">{d.user_id}</option>
                                                     ))}
                                                 </select>
                                                 <div className="flex gap-2">
                                                     <button 
                                                         onClick={() => handleAssignDriver(item.id)}
-                                                        className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-sm transition-colors shadow-sm"
+                                                        className="flex-1 py-2 bg-neonGreen text-black font-bold rounded-xl text-sm transition-all hover:scale-105 hover:shadow-[0_0_20px_#00FF88]"
                                                     >
                                                         Send Options
                                                     </button>
                                                     <button 
                                                         onClick={() => { setSolvingId(null); setSelectedDriver(''); }}
-                                                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-lg text-sm transition-colors"
+                                                        className="px-4 py-2 border border-white/10 text-textMuted hover:text-textPrimary font-bold rounded-xl text-sm transition-colors"
                                                     >
                                                         Cancel
                                                     </button>
@@ -228,7 +235,7 @@ export default function ComplaintsPage() {
                                         ) : (
                                             <button 
                                                 onClick={() => setSolvingId(item.id)}
-                                                className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl text-sm transition-colors border border-gray-300 shadow-sm"
+                                                className="w-full py-2.5 bg-black/30 border border-white/10 hover:border-neonGreen/40 text-textPrimary hover:text-neonGreen font-bold rounded-xl text-sm transition-colors shadow-sm"
                                             >
                                                 Solve (Assign Driver)
                                             </button>
@@ -237,16 +244,16 @@ export default function ComplaintsPage() {
                                 )}
                                 
                                 {(session?.user?.role === 'admin' || session?.user?.role === 'driver') && (
-                                    <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                                    <div className="mt-4 pt-4 border-t border-white/10 flex gap-2">
                                         <button 
                                             onClick={() => handleStatusChange(item.id, 'approved')}
-                                            className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${item.status === 'approved' ? 'bg-amber-600 text-white pointer-events-none' : 'bg-amber-50 text-amber-600 hover:bg-amber-100'}`}
+                                            className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${item.status === 'approved' ? 'bg-warning text-black border-warning pointer-events-none' : 'bg-warning/10 text-warning border-warning/30 hover:bg-warning/20'}`}
                                         >
                                             {item.status === 'approved' ? 'Approved ✓' : 'Approve'}
                                         </button>
                                         <button 
                                             onClick={() => handleStatusChange(item.id, 'resolved')}
-                                            className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${item.status === 'resolved' ? 'bg-green-600 text-white pointer-events-none' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
+                                            className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${item.status === 'resolved' ? 'bg-neonGreen text-black border-neonGreen pointer-events-none' : 'bg-neonGreen/10 text-neonGreen border-neonGreen/30 hover:bg-neonGreen/20'}`}
                                         >
                                             {item.status === 'resolved' ? 'Resolved ✓' : 'Resolve'}
                                         </button>

@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050F0A;
+  --foreground: #E8F5E9;
 }
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-appBg text-textPrimary antialiased;
     font-family: 'Raleway', sans-serif;
   }
 }
