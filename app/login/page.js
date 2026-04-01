@@ -124,10 +124,16 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-10 pt-8 border-t border-borderColor text-center space-y-4">
-                        <p className="text-sm text-textMuted">
+                        <p className="text-sm text-textMuted lowercase">
                             don't have an account? {' '}
-                            <Link href="/register" className="text-primary font-medium hover:underline transition-all">
+                            <Link href="/register" className="text-secondary font-semibold hover:underline transition-all">
                                 register as user
+                            </Link>
+                        </p>
+                        <p className="text-sm text-textMuted lowercase border-t border-borderColor/50 pt-4">
+                            want to work with us? {' '}
+                            <Link href="/register/driver" className="text-primary font-semibold hover:underline transition-all uppercase tracking-widest text-[10px]">
+                                apply as driver
                             </Link>
                         </p>
                         <Link href="/" className="inline-flex items-center gap-2 text-xs text-textMuted hover:text-primary transition-colors">

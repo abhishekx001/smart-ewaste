@@ -13,20 +13,30 @@ export async function POST(request) {
         }
 
         const assignRole = role || 'user';
-        
-        // Basic check to prevent assigning admin/driver roles directly from public register 
-        // if we wanted to secure it, but for this generic registration we'll allow 'user'
-        if (assignRole !== 'user') {
+        let status = 'approved';
+
+        // Basic check to prevent assigning admin roles directly from public register 
+        if (assignRole === 'admin') {
             return new Response(JSON.stringify({ message: "Invalid role selected." }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
+        // Drivers start as pending
+        if (assignRole === 'driver') {
+            status = 'pending';
+        }
+
         // Insert into Supabase
         const { data, error } = await supabase
             .from('users')
-            .insert({ user_id: userId, password: password, role: assignRole })
+            .insert({ 
+                user_id: userId, 
+                password: password, 
+                role: assignRole,
+                status: status 
+            })
             .select('*')
             .single();
 

@@ -26,6 +26,11 @@ const handler = NextAuth({
                         throw new Error("No user found with this User ID");
                     }
 
+                    // Drivers need approved status to log in
+                    if (user.role === 'driver' && user.status !== 'approved') {
+                        throw new Error("Your application is still under review. Please wait for admin approval.");
+                    }
+
                     // Simple password check
                     if (user.password !== credentials.password) {
                         throw new Error("Invalid password");

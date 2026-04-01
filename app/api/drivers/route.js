@@ -5,7 +5,8 @@ export async function GET(request) {
         const { data, error } = await supabase
             .from('users')
             .select('user_id')
-            .eq('role', 'driver');
+            .eq('role', 'driver')
+            .eq('status', 'approved');
 
         if (error) {
             throw new Error(error.message);

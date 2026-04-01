@@ -17,7 +17,8 @@ import {
   MessageSquare,
   LayoutDashboard,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Users
 } from "lucide-react";
 
 export default function Home() {
@@ -90,6 +91,7 @@ export default function Home() {
                   <>
                     <Link href="/add" className="text-sm font-medium text-textMuted hover:text-primary transition-all duration-150">Add Bin</Link>
                     <Link href="/collect" className="text-sm font-medium text-textMuted hover:text-primary transition-all duration-150">Bins Map</Link>
+                    <Link href="/admin/drivers" className="text-sm font-medium text-textMuted hover:text-primary transition-all duration-150">Manage Drivers</Link>
                     <Link href="/collected" className="text-sm font-medium text-textMuted hover:text-primary transition-all duration-150">Collection Logs</Link>
                     <Link href="/complaints" className="text-sm font-semibold text-primary px-3 py-1 bg-primary/5 rounded-md flex items-center gap-1.5 transition-all duration-150">
                       Manage Complaints
@@ -197,7 +199,7 @@ export default function Home() {
       {status === 'authenticated' && session?.user?.role === 'admin' && (
         <section className="py-24 max-w-[1280px] mx-auto px-6">
           <h3 className="text-lg font-semibold text-textPrimary mb-8 uppercase tracking-widest italic opacity-50">Admin Quick Access</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             <Link href="/complaints" className="bg-surface border border-borderColor p-8 rounded-lg hover:bg-white transition-all group">
               <AlertCircle className="w-8 h-8 text-danger mb-4" />
               <h4 className="text-sm font-semibold mb-1">Manage Complaints</h4>
@@ -217,6 +219,11 @@ export default function Home() {
               <History className="w-8 h-8 text-textMuted mb-4" />
               <h4 className="text-sm font-semibold mb-1">Collection Logs</h4>
               <p className="text-xs text-textMuted italic">Audit histories of all bin collection activities.</p>
+            </Link>
+            <Link href="/admin/drivers" className="bg-surface border border-borderColor p-8 rounded-lg hover:bg-white transition-all group">
+              <Users className="w-8 h-8 text-primary mb-4" />
+              <h4 className="text-sm font-semibold mb-1">Admin Drivers</h4>
+              <p className="text-xs text-textMuted italic">Review and approve new driver applications.</p>
             </Link>
           </div>
         </section>
