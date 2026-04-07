@@ -17,13 +17,18 @@
     @apply border-borderColor;
     box-shadow: none !important;
   }
-  
+
   body {
     @apply bg-appBg text-textPrimary antialiased selection:bg-secondary/20;
     font-family: 'Poppins', sans-serif;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight text-textPrimary;
   }
 
@@ -36,11 +41,11 @@
   .btn-primary {
     @apply bg-primary text-white font-medium rounded-lg px-5 py-2 hover:opacity-90 transition-opacity duration-150;
   }
-  
+
   .btn-secondary {
     @apply border border-borderColor text-textPrimary font-medium rounded-lg px-5 py-2 hover:bg-surface transition-all duration-150;
   }
-  
+
   .btn-danger {
     @apply border border-red-200 text-danger rounded-lg px-5 py-2 hover:bg-red-50 transition-all duration-150 font-medium;
   }
@@ -60,6 +65,7 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

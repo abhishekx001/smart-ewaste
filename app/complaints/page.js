@@ -3,18 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { 
-    AlertCircle, 
-    CheckCircle2, 
-    Clock, 
-    Trash2, 
-    User, 
-    MapPin, 
-    ShieldCheck, 
-    ChevronLeft, 
-    Menu, 
-    X, 
-    Trash, 
+import {
+    AlertCircle,
+    CheckCircle2,
+    Clock,
+    Trash2,
+    User,
+    MapPin,
+    ShieldCheck,
+    ChevronLeft,
+    Menu,
+    X,
+    Trash,
     Truck,
     Settings2
 } from "lucide-react";
@@ -149,8 +149,8 @@ export default function ComplaintsPage() {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <button 
-                        className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95" 
+                    <button
+                        className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95"
                         onClick={toggleSidebar}
                     >
                         {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -198,13 +198,13 @@ export default function ComplaintsPage() {
                                 </div>
                                 <h3 className="text-lg font-semibold text-textPrimary mb-1 italic leading-tight capitalize">{item.bin_location}</h3>
                                 <p className="text-sm text-textMuted mb-6 italic leading-relaxed">"{item.description}"</p>
-                                
+
                                 <div className="mt-auto space-y-5">
                                     <div className="flex items-center gap-3 text-[10px] text-textMuted font-bold uppercase tracking-widest italic pt-6 border-t border-borderColor/50">
                                         <Clock className="w-3.5" />
                                         <span>Log Date: {new Date(item.created_at).toLocaleDateString()}</span>
                                     </div>
-                                    
+
                                     {session.user.role === 'admin' && (
                                         <div className="space-y-4">
                                             <div className="flex flex-col gap-2">
@@ -213,7 +213,7 @@ export default function ComplaintsPage() {
                                                     <span className="text-[10px] font-semibold text-textPrimary px-2 py-0.5 bg-borderColor/30 rounded">{item.user_id}</span>
                                                 </div>
                                                 <div className="text-[10px] text-textMuted italic mb-2">Details: {item.user_details}</div>
-                                                
+
                                                 <label className="text-[10px] font-bold text-textMuted uppercase tracking-widest italic pb-1 border-t border-borderColor/30 pt-3">Dispatch Agent</label>
                                                 <select
                                                     value={item.assigned_driver || ''}
@@ -234,7 +234,7 @@ export default function ComplaintsPage() {
                                                 )}
                                                 <div className="flex gap-2">
                                                     {item.status === 'pending' && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleUpdateStatus(item._id, 'in-progress')}
                                                             disabled={!item.assigned_driver}
                                                             className={`flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest rounded border transition-all ${!item.assigned_driver ? 'bg-borderColor/10 text-textMuted border-borderColor/40 cursor-not-allowed' : 'btn-secondary bg-primary/5 border-primary/20 text-primary hover:bg-primary/10'}`}
@@ -243,7 +243,7 @@ export default function ComplaintsPage() {
                                                         </button>
                                                     )}
                                                     {item.status === 'driver-completed' && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleUpdateStatus(item._id, 'resolved')}
                                                             className="btn-primary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                                                         >
@@ -251,7 +251,7 @@ export default function ComplaintsPage() {
                                                         </button>
                                                     )}
                                                     {item.status !== 'resolved' && item.status !== 'driver-completed' && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleUpdateStatus(item._id, 'resolved')}
                                                             disabled={!item.assigned_driver}
                                                             className={`flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest rounded transition-all ${!item.assigned_driver ? 'bg-borderColor/20 text-textMuted cursor-not-allowed' : 'btn-primary'}`}
@@ -274,7 +274,7 @@ export default function ComplaintsPage() {
                                             <div className="text-[10px] font-bold text-primary uppercase tracking-widest italic bg-primary/5 p-3 rounded border border-primary/10 flex items-center gap-2">
                                                 <Truck className="w-3.5" /> This task is assigned to you
                                             </div>
-                                            
+
                                             <div className="flex flex-col gap-2">
                                                 <Link
                                                     href={item.latitude && item.longitude ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.bin_location)}`}
@@ -283,16 +283,16 @@ export default function ComplaintsPage() {
                                                 >
                                                     <MapPin className="w-3" /> View Location Map
                                                 </Link>
-                                                
+
                                                 {item.status !== 'resolved' && item.status !== 'driver-completed' && (
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleUpdateStatus(item._id, 'driver-completed')}
                                                         className="btn-primary w-full py-3 text-xs italic font-bold uppercase tracking-widest"
                                                     >
                                                         Mark as Completed
                                                     </button>
                                                 )}
-                                                
+
                                                 {item.status === 'driver-completed' && (
                                                     <div className="w-full text-center py-3 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded uppercase tracking-widest italic">
                                                         Submitted - Pending Admin Review
@@ -329,8 +329,8 @@ export default function ComplaintsPage() {
                                 Dedicated incident management and logistics optimization for metropolitan waste networks.
                             </p>
                             <div className="flex gap-4">
-                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><AlertCircle className="w-4 h-4 text-secondary"/></div>
-                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Settings2 className="w-4 h-4 text-secondary"/></div>
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><AlertCircle className="w-4 h-4 text-secondary" /></div>
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Settings2 className="w-4 h-4 text-secondary" /></div>
                             </div>
                         </div>
 
@@ -372,7 +372,7 @@ export default function ComplaintsPage() {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <p className="text-[10px] text-white/30 tracking-[0.2em] font-bold uppercase">© 2026 EcoTrack Systems. High-security data environment.</p>
                         <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded">
@@ -384,17 +384,17 @@ export default function ComplaintsPage() {
             </footer>
 
             {/* Mobile Sidebar */}
-            <div 
+            <div
                 className={`fixed inset-0 z-[100] lg:hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
             >
                 {/* Backdrop overlay */}
-                <div 
+                <div
                     className="absolute inset-0 bg-black/20 backdrop-blur-sm"
                     onClick={toggleSidebar}
                 ></div>
-                
+
                 {/* Sliding Panel */}
-                <div 
+                <div
                     className={`absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white p-8 shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 >
                     <div className="flex justify-between items-center mb-12">
@@ -404,8 +404,8 @@ export default function ComplaintsPage() {
                             </div>
                             <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
                         </Link>
-                        <button 
-                            onClick={toggleSidebar} 
+                        <button
+                            onClick={toggleSidebar}
                             className="w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary"
                         >
                             <X className="w-5 h-5" />
@@ -439,8 +439,8 @@ export default function ComplaintsPage() {
                             </span>
                             <p className="text-[10px] text-primary/50 mt-1 uppercase tracking-widest font-bold italic">incident management</p>
                         </Link>
-                        
-                        <button 
+
+                        <button
                             onClick={() => { signOut({ callbackUrl: '/' }); toggleSidebar(); }}
                             className="text-left mt-4"
                         >

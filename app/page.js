@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import { 
-  Trash2, 
-  MapPin, 
-  AlertCircle, 
-  Truck, 
-  Menu, 
-  X, 
+import {
+  Trash2,
+  MapPin,
+  AlertCircle,
+  Truck,
+  Menu,
+  X,
   ArrowRight,
   Plus,
   History,
@@ -41,19 +41,19 @@ export default function Home() {
           fetch('/api/location'),
           fetch('/api/complaints')
         ]);
-        
+
         const locData = await locRes.json();
         const compData = await compRes.json();
-        
+
         const locs = locData.locations || [];
         const comps = compData.complaints || [];
-        
+
         setLocations(locs);
         setComplaints(comps);
-        
+
         const collectionsToday = locs.filter(l => l.status === 'collected').length;
         const activeAlerts = comps.filter(c => c.status !== 'resolved').length;
-        
+
         setStats({
           totalBins: locs.length,
           activeAlerts: activeAlerts,
@@ -130,7 +130,6 @@ export default function Home() {
               </>
             ) : (
               <div className="flex items-center gap-6">
-                <Link href="/login" className="text-sm font-medium text-textMuted hover:text-primary transition-all duration-150">Sign In</Link>
                 <Link href="/login" className="btn-primary flex items-center gap-2 text-sm leading-none">
                   Logistics Portal <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -139,8 +138,8 @@ export default function Home() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95" 
+          <button
+            className="lg:hidden w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary hover:bg-white transition-all active:scale-95"
             onClick={toggleSidebar}
           >
             {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -170,11 +169,11 @@ export default function Home() {
           </div>
         </div>
         <div className="relative h-[480px] w-full rounded-sm overflow-hidden">
-          <Image 
-            src="/hero1.jpg" 
-            alt="Smart City Logistics" 
-            fill 
-            className="object-cover" 
+          <Image
+            src="/hero1.jpg"
+            alt="Smart City Logistics"
+            fill
+            className="object-cover"
             priority
           />
         </div>
@@ -271,11 +270,11 @@ export default function Home() {
       <section className="bg-surface border-y border-borderColor overflow-hidden">
         <div className="max-w-[1280px] mx-auto grid lg:grid-cols-2 items-stretch">
           <div className="relative h-[400px] lg:h-auto">
-            <Image 
-              src="/img1.webp" 
-              alt="Sustainability Initiatives" 
-              fill 
-              className="object-cover rounded-none" 
+            <Image
+              src="/img1.webp"
+              alt="Sustainability Initiatives"
+              fill
+              className="object-cover rounded-none"
             />
           </div>
           <div className="p-16 lg:p-24 flex flex-col justify-center">
@@ -328,43 +327,43 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-white pt-24 pb-16 mt-24">
+      <footer className="bg-surface text-textPrimary pt-24 pb-16 mt-24 border-t border-borderColor">
         <div className="max-w-[1280px] mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 pb-16 border-b border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 pb-16 border-b border-borderColor">
             {/* Branding & Info */}
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden border border-borderColor">
                   <Image src="/logo main.jpg" alt="EcoTrack Logo" fill className="object-cover" />
                 </div>
-                <span className="text-2xl font-bold tracking-tight italic">EcoTrack</span>
+                <span className="text-2xl font-bold tracking-tight italic text-primary">EcoTrack</span>
               </div>
-              <p className="text-xs text-white/50 leading-relaxed uppercase tracking-widest font-semibold italic">
+              <p className="text-xs text-textMuted leading-relaxed uppercase tracking-widest font-semibold italic">
                 Efficient city logistics through intelligent bin monitoring and real-time incident resolution.
               </p>
               <div className="flex gap-4">
-                 <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Trash2 className="w-4 h-4 text-secondary"/></div>
-                 <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><MapPin className="w-4 h-4 text-secondary"/></div>
+                 <div className="w-8 h-8 rounded-full bg-white border border-borderColor flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Trash2 className="w-4 h-4 text-primary"/></div>
+                 <div className="w-8 h-8 rounded-full bg-white border border-borderColor flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><MapPin className="w-4 h-4 text-primary"/></div>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Navigation</h4>
-              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
-                 <li><Link href="/" className="hover:text-white transition-colors">Home Dashboard</Link></li>
-                 <li><Link href="/collect" className="hover:text-white transition-colors">Live Bin Map</Link></li>
-                 <li><Link href="/complaints" className="hover:text-white transition-colors">Incident Center</Link></li>
-                 <li><Link href="/collected" className="hover:text-white transition-colors">System Archive</Link></li>
+              <h4 className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-8">Navigation</h4>
+              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-textMuted">
+                 <li><Link href="/" className="hover:text-primary transition-colors">Home Dashboard</Link></li>
+                 <li><Link href="/collect" className="hover:text-primary transition-colors">Live Bin Map</Link></li>
+                 <li><Link href="/complaints" className="hover:text-primary transition-colors">Incident Center</Link></li>
+                 <li><Link href="/collected" className="hover:text-primary transition-colors">System Archive</Link></li>
               </ul>
             </div>
 
             {/* Logistics Network */}
             <div>
-              <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Resources</h4>
-              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
-                 <li><Link href="/complaints/new" className="hover:text-white transition-colors">Submit Request</Link></li>
-                 <li><Link href="/admin/drivers" className="hover:text-white transition-colors">Driver Recruitment</Link></li>
+              <h4 className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-8">Resources</h4>
+              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-textMuted">
+                 <li><Link href="/complaints/new" className="hover:text-primary transition-colors">Submit Request</Link></li>
+                 <li><Link href="/admin/drivers" className="hover:text-primary transition-colors">Driver Recruitment</Link></li>
                  <li><span className="opacity-50">Logistics Manual</span></li>
                  <li><span className="opacity-50">Terms of Service</span></li>
               </ul>
@@ -373,12 +372,12 @@ export default function Home() {
             {/* Contact & Status */}
             <div className="flex flex-col gap-8">
               <div>
-                <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-6">Contact Node</h4>
-                <p className="text-sm font-semibold italic leading-none mb-1">080 - 2456 - ECO</p>
-                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Main Dispatch Line</p>
+                <h4 className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-6">Contact Node</h4>
+                <p className="text-sm font-semibold italic leading-none mb-1 text-textPrimary">080 - 2456 - ECO</p>
+                <p className="text-[10px] text-textMuted font-bold uppercase tracking-widest">Main Dispatch Line</p>
               </div>
-              <div className="bg-white/10 p-5 rounded border border-white/20">
-                <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2">System Status</p>
+              <div className="bg-white p-5 rounded border border-borderColor">
+                <p className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-2">System Status</p>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-secondary">
                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
                    NETWORK FULLY OPERATIONAL
@@ -388,8 +387,8 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-[10px] text-white/30 tracking-[0.2em] font-bold uppercase">© 2026 EcoTrack Systems. All city logistics encryption active.</p>
-            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded">
+            <p className="text-[10px] text-textMuted tracking-[0.2em] font-bold uppercase">© 2026 EcoTrack Systems. All city logistics encryption active.</p>
+            <div className="flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded">
                <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
                <span className="text-[9px] font-bold text-secondary uppercase tracking-widest">Secure Terminal Node</span>
             </div>
@@ -398,17 +397,17 @@ export default function Home() {
       </footer>
 
       {/* Mobile Sidebar */}
-      <div 
+      <div
         className={`fixed inset-0 z-[100] lg:hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
       >
         {/* Backdrop overlay */}
-        <div 
+        <div
           className="absolute inset-0 bg-black/20 backdrop-blur-sm"
           onClick={toggleSidebar}
         ></div>
-        
+
         {/* Sliding Panel */}
-        <div 
+        <div
           className={`absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white p-8 shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
         >
           <div className="flex justify-between items-center mb-12">
@@ -418,8 +417,8 @@ export default function Home() {
               </div>
               <span className="text-xl font-semibold text-textPrimary tracking-tight">EcoTrack</span>
             </Link>
-            <button 
-              onClick={toggleSidebar} 
+            <button
+              onClick={toggleSidebar}
               className="w-10 h-10 flex items-center justify-center bg-surface border border-borderColor rounded-lg text-textPrimary"
             >
               <X className="w-5 h-5" />
@@ -445,15 +444,15 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-8 flex-grow overflow-y-auto pr-2 pb-8">
-             {status === 'authenticated' ? (
-               <>
-                 <Link href="/" className="group" onClick={toggleSidebar}>
-                   <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Home</span>
-                   <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">main control dashboard</p>
-                 </Link>
-                 
-                 {session.user.role === 'admin' && (
-                   <>
+            {status === 'authenticated' ? (
+              <>
+                <Link href="/" className="group" onClick={toggleSidebar}>
+                  <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Home</span>
+                  <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">main control dashboard</p>
+                </Link>
+
+                {session.user.role === 'admin' && (
+                  <>
                     <Link href="/complaints" className="group" onClick={toggleSidebar}>
                       <span className="text-3xl font-semibold text-primary italic leading-none flex items-center justify-between">
                         Complaints
@@ -473,11 +472,11 @@ export default function Home() {
                       <span className="text-3xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">History</span>
                       <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">collection archives</p>
                     </Link>
-                   </>
-                 )}
+                  </>
+                )}
 
-                 {session.user.role === 'driver' && (
-                   <>
+                {session.user.role === 'driver' && (
+                  <>
                     <Link href="/collect" className="group" onClick={toggleSidebar}>
                       <span className="text-3xl font-semibold text-textPrimary leading-none italic">Route Map</span>
                       <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">active pickup routes</p>
@@ -490,19 +489,19 @@ export default function Home() {
                       <span className="text-3xl font-semibold text-textPrimary leading-none italic">My Logs</span>
                       <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">submission history</p>
                     </Link>
-                   </>
-                 )}
+                  </>
+                )}
 
-                 <button 
+                <button
                   onClick={() => { signOut({ callbackUrl: '/' }); toggleSidebar(); }}
                   className="mt-4 text-left group"
                 >
                   <span className="text-2xl font-semibold text-danger italic leading-none">Log Out</span>
                   <p className="text-[10px] text-danger/40 mt-1 uppercase tracking-widest font-medium italic">terminate active session</p>
                 </button>
-               </>
-             ) : (
-               <div className="flex flex-col gap-10">
+              </>
+            ) : (
+              <div className="flex flex-col gap-10">
                 <Link href="/" className="group" onClick={toggleSidebar}>
                   <span className="text-4xl font-semibold text-textPrimary group-hover:text-primary transition-colors italic leading-none">Overview</span>
                   <p className="text-[11px] text-textMuted mt-1 uppercase tracking-widest font-medium italic">public network dashboard</p>
@@ -511,8 +510,8 @@ export default function Home() {
                   <span className="text-4xl font-semibold text-primary italic leading-none tracking-tight">Login Portal</span>
                   <p className="text-[11px] text-primary/50 mt-1 uppercase tracking-widest font-medium italic">secure staff access</p>
                 </Link>
-               </div>
-             )}
+              </div>
+            )}
           </div>
 
           <div className="absolute bottom-10 left-8 right-8 pt-10 border-t border-borderColor">
