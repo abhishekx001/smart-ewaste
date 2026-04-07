@@ -150,7 +150,9 @@ export default function CollectPage() {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-borderColor">
                 <div className="max-w-[1280px] mx-auto px-6 h-20 flex justify-between items-center">
                     <Link href="/" className="flex items-center gap-3">
-                        <Trash className="w-5 h-5 text-primary" />
+                        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+                            <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                        </div>
                         <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
                     </Link>
 
@@ -279,24 +281,71 @@ export default function CollectPage() {
                 )}
             </main>
 
-            <footer className="bg-primary pt-24 pb-16">
+            <footer className="bg-primary text-white pt-24 pb-16 mt-24">
                 <div className="max-w-[1280px] mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
-                        <div className="flex items-center gap-3">
-                            <Trash className="w-5 h-5 text-secondary" />
-                            <span className="text-xl font-semibold text-white tracking-tight italic">EcoTrack</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 pb-16 border-b border-white/10">
+                        {/* Branding & Info */}
+                        <div className="flex flex-col gap-6">
+                            <div className="flex items-center gap-3">
+                                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
+                                    <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                                </div>
+                                <span className="text-2xl font-bold tracking-tight italic">EcoTrack</span>
+                            </div>
+                            <p className="text-xs text-white/50 leading-relaxed uppercase tracking-widest font-semibold italic">
+                                Real-time coordinates and routing efficiency for the metropolitan waste management network.
+                            </p>
+                            <div className="flex gap-4">
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><MapPin className="w-4 h-4 text-secondary"/></div>
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><History className="w-4 h-4 text-secondary"/></div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-10">
-                            <Link href="/" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">home</Link>
-                            <Link href="/collect" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">bins map</Link>
-                            <Link href="/complaints" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-bold">complaints</Link>
+
+                        {/* Quick Links */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">System Access</h4>
+                            <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                                <li><Link href="/" className="hover:text-white transition-colors">Main Console</Link></li>
+                                <li><Link href="/collect" className="hover:text-white transition-colors">Live Routing</Link></li>
+                                <li><Link href="/complaints" className="hover:text-white transition-colors">Incident Logs</Link></li>
+                                <li><Link href="/collected" className="hover:text-white transition-colors">Collection History</Link></li>
+                            </ul>
                         </div>
-                        <div className="text-xs text-secondary font-bold uppercase tracking-widest italic">
-                            &copy; 2026 eco systems
+
+                        {/* Network Resources */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Operator Tools</h4>
+                            <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                                <li><Link href="/add" className="hover:text-white transition-colors">Register Exit Node</Link></li>
+                                <li><Link href="/admin/drivers" className="hover:text-white transition-colors">Recruitment Hub</Link></li>
+                                <li><span className="opacity-50 text-[10px]">Infrastructure Stats</span></li>
+                                <li><span className="opacity-50 text-[10px]">Privacy Policy</span></li>
+                            </ul>
+                        </div>
+
+                        {/* Logistics Status */}
+                        <div className="flex flex-col gap-8">
+                            <div>
+                                <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-6">Logistics Desk</h4>
+                                <p className="text-sm font-semibold italic leading-none mb-1">080 - 4500 - TRACK</p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Network Support</p>
+                            </div>
+                            <div className="bg-white/10 p-5 rounded border border-white/20">
+                                <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2">Network Health</p>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-secondary">
+                                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+                                    GEOSPATIAL LINK ACTIVE
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="flex justify-center pt-12 border-t border-white/10">
-                        <p className="text-[10px] text-white/30 tracking-[0.4em] uppercase font-bold">mission: clean city logistics</p>
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <p className="text-[10px] text-white/30 tracking-[0.2em] font-bold uppercase">© 2026 Eco Systems. All geospatial data encrypted.</p>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded">
+                            <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+                            <span className="text-[9px] font-bold text-secondary uppercase tracking-widest">Enterprise Network Node</span>
+                        </div>
                     </div>
                 </div>
             </footer>
@@ -317,7 +366,9 @@ export default function CollectPage() {
                 >
                     <div className="flex justify-between items-center mb-12">
                         <Link href="/" className="flex items-center gap-2" onClick={toggleSidebar}>
-                            <Trash className="w-5 h-5 text-primary" />
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+                                <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                            </div>
                             <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
                         </Link>
                         <button 

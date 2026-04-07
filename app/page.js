@@ -77,7 +77,9 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-borderColor">
         <div className="max-w-[1280px] mx-auto px-6 h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3">
-            <Trash2 className="w-6 h-6 text-primary" />
+            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+              <Image src="/logo main.jpg" alt="EcoTrack Logo" fill className="object-cover" />
+            </div>
             <span className="text-xl font-semibold text-textPrimary tracking-tight">EcoTrack</span>
           </Link>
 
@@ -169,8 +171,8 @@ export default function Home() {
         </div>
         <div className="relative h-[480px] w-full rounded-sm overflow-hidden">
           <Image 
-            src="https://images.unsplash.com/photo-1611735341450-74d61e660ad2?w=800" 
-            alt="Smart City" 
+            src="/hero1.jpg" 
+            alt="Smart City Logistics" 
             fill 
             className="object-cover" 
             priority
@@ -237,25 +239,25 @@ export default function Home() {
             {
               step: '01',
               title: 'bins are monitored',
-              img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+              img: '/bin monitoring.jpg',
               text: 'Sensors inside each bin track fill levels in real time and send data to the cloud dashboard instantly.'
             },
             {
               step: '02',
               title: 'alerts are triggered',
-              img: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400',
+              img: '/collection3.jpg',
               text: 'When a bin reaches capacity, automated alerts notify the management team for immediate action.'
             },
             {
               step: '03',
               title: 'routes are optimized',
-              img: 'https://images.unsplash.com/photo-1569144157591-c60f3f82f137?w=400',
+              img: '/hero 2 collection.jpg',
               text: 'Collection vehicles follow smart optimized routes to empty only the bins that need it, saving time and fuel.'
             }
           ].map((item, i) => (
             <div key={i} className="flex flex-col p-8">
-              <div className="relative h-56 w-full mb-8">
-                <Image src={item.img} alt={item.title} fill className="object-cover rounded-none" />
+              <div className="relative h-56 w-full mb-8 overflow-hidden rounded-lg border border-borderColor/20">
+                <Image src={item.img} alt={item.title} fill className="object-cover" />
               </div>
               <p className="text-xs font-semibold text-primary mb-2 italic">step {item.step}</p>
               <h4 className="text-lg font-semibold text-textPrimary mb-3">{item.title}</h4>
@@ -270,8 +272,8 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto grid lg:grid-cols-2 items-stretch">
           <div className="relative h-[400px] lg:h-auto">
             <Image 
-              src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600" 
-              alt="Nature Sustainability" 
+              src="/img1.webp" 
+              alt="Sustainability Initiatives" 
               fill 
               className="object-cover rounded-none" 
             />
@@ -326,25 +328,71 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary pt-24 pb-16">
+      <footer className="bg-primary text-white pt-24 pb-16 mt-24">
         <div className="max-w-[1280px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
-            <div className="flex items-center gap-3">
-              <Trash2 className="w-5 h-5 text-secondary" />
-              <span className="text-xl font-semibold text-white tracking-tight">EcoTrack</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 pb-16 border-b border-white/10">
+            {/* Branding & Info */}
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
+                  <Image src="/logo main.jpg" alt="EcoTrack Logo" fill className="object-cover" />
+                </div>
+                <span className="text-2xl font-bold tracking-tight italic">EcoTrack</span>
+              </div>
+              <p className="text-xs text-white/50 leading-relaxed uppercase tracking-widest font-semibold italic">
+                Efficient city logistics through intelligent bin monitoring and real-time incident resolution.
+              </p>
+              <div className="flex gap-4">
+                 <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Trash2 className="w-4 h-4 text-secondary"/></div>
+                 <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><MapPin className="w-4 h-4 text-secondary"/></div>
+              </div>
             </div>
-            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
-              <Link href="/collect" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">dashboard</Link>
-              <Link href="/collect" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">bins network</Link>
-              <Link href="/complaints" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">incident logs</Link>
-              <Link href="/" className="text-xs text-white/70 hover:text-white transition-colors uppercase tracking-widest font-medium">system routes</Link>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Navigation</h4>
+              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                 <li><Link href="/" className="hover:text-white transition-colors">Home Dashboard</Link></li>
+                 <li><Link href="/collect" className="hover:text-white transition-colors">Live Bin Map</Link></li>
+                 <li><Link href="/complaints" className="hover:text-white transition-colors">Incident Center</Link></li>
+                 <li><Link href="/collected" className="hover:text-white transition-colors">System Archive</Link></li>
+              </ul>
             </div>
-            <div className="text-xs text-secondary font-medium italic">
-              &copy; 2026. all rights reserved.
+
+            {/* Logistics Network */}
+            <div>
+              <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Resources</h4>
+              <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                 <li><Link href="/complaints/new" className="hover:text-white transition-colors">Submit Request</Link></li>
+                 <li><Link href="/admin/drivers" className="hover:text-white transition-colors">Driver Recruitment</Link></li>
+                 <li><span className="opacity-50">Logistics Manual</span></li>
+                 <li><span className="opacity-50">Terms of Service</span></li>
+              </ul>
+            </div>
+
+            {/* Contact & Status */}
+            <div className="flex flex-col gap-8">
+              <div>
+                <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-6">Contact Node</h4>
+                <p className="text-sm font-semibold italic leading-none mb-1">080 - 2456 - ECO</p>
+                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Main Dispatch Line</p>
+              </div>
+              <div className="bg-white/10 p-5 rounded border border-white/20">
+                <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2">System Status</p>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-secondary">
+                   <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+                   NETWORK FULLY OPERATIONAL
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex justify-center pt-12 border-t border-white/10">
-            <p className="text-[10px] text-white/40 tracking-[0.4em] uppercase font-bold">built for smart city waste logistics</p>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-[10px] text-white/30 tracking-[0.2em] font-bold uppercase">© 2026 EcoTrack Systems. All city logistics encryption active.</p>
+            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded">
+               <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+               <span className="text-[9px] font-bold text-secondary uppercase tracking-widest">Secure Terminal Node</span>
+            </div>
           </div>
         </div>
       </footer>
@@ -365,7 +413,9 @@ export default function Home() {
         >
           <div className="flex justify-between items-center mb-12">
             <Link href="/" className="flex items-center gap-2" onClick={toggleSidebar}>
-              <Trash2 className="w-5 h-5 text-primary" />
+              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+                <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+              </div>
               <span className="text-xl font-semibold text-textPrimary tracking-tight">EcoTrack</span>
             </Link>
             <button 

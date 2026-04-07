@@ -15,7 +15,8 @@ import {
     Menu, 
     X, 
     Trash, 
-    Truck 
+    Truck,
+    Settings2
 } from "lucide-react";
 import Image from "next/image";
 
@@ -128,7 +129,9 @@ export default function ComplaintsPage() {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-borderColor">
                 <div className="max-w-[1280px] mx-auto px-6 h-20 flex justify-between items-center">
                     <Link href="/" className="flex items-center gap-3">
-                        <Trash className="w-5 h-5 text-primary" />
+                        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+                            <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                        </div>
                         <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
                     </Link>
 
@@ -311,17 +314,70 @@ export default function ComplaintsPage() {
                 )}
             </main>
 
-            <footer className="bg-primary pt-24 pb-16">
+            <footer className="bg-primary text-white pt-24 pb-16 mt-24">
                 <div className="max-w-[1280px] mx-auto px-6">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-16 mb-16 flex-col md:flex-row gap-8">
-                        <div className="flex items-center gap-3">
-                            <Trash className="w-5 h-5 text-secondary" />
-                            <span className="text-xl font-semibold text-white tracking-tight italic">EcoTrack</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 pb-16 border-b border-white/10">
+                        {/* Branding & Info */}
+                        <div className="flex flex-col gap-6">
+                            <div className="flex items-center gap-3">
+                                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
+                                    <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                                </div>
+                                <span className="text-2xl font-bold tracking-tight italic">EcoTrack</span>
+                            </div>
+                            <p className="text-xs text-white/50 leading-relaxed uppercase tracking-widest font-semibold italic">
+                                Dedicated incident management and logistics optimization for metropolitan waste networks.
+                            </p>
+                            <div className="flex gap-4">
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><AlertCircle className="w-4 h-4 text-secondary"/></div>
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"><Settings2 className="w-4 h-4 text-secondary"/></div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-10">
-                            <Link href="/" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold">home</Link>
-                            <Link href="/collect" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold">bins network</Link>
-                            <Link href="/complaints" className="text-xs text-white/50 hover:text-white transition-colors font-bold uppercase tracking-widest font-bold underline underline-offset-8 decoration-secondary">incidents</Link>
+
+                        {/* Quick Links */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Navigation</h4>
+                            <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                                <li><Link href="/" className="hover:text-white transition-colors">Dashboard Home</Link></li>
+                                <li><Link href="/collect" className="hover:text-white transition-colors">Bins Network</Link></li>
+                                <li><Link href="/complaints" className="hover:text-white transition-colors">Active Incidents</Link></li>
+                                <li><Link href="/collected" className="hover:text-white transition-colors">History Logs</Link></li>
+                            </ul>
+                        </div>
+
+                        {/* Logistics Network */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-8">Resources</h4>
+                            <ul className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest text-white/60">
+                                <li><Link href="/complaints/new" className="hover:text-white transition-colors">New Submission</Link></li>
+                                <li><Link href="/admin/drivers" className="hover:text-white transition-colors">Staff Portal</Link></li>
+                                <li><span className="opacity-50 text-[10px]">Security Protocols</span></li>
+                                <li><span className="opacity-50 text-[10px]">Data Privacy</span></li>
+                            </ul>
+                        </div>
+
+                        {/* Contact & Status */}
+                        <div className="flex flex-col gap-8">
+                            <div>
+                                <h4 className="text-[10px] font-bold text-secondary uppercase tracking-[0.3em] mb-6">Support Node</h4>
+                                <p className="text-sm font-semibold italic leading-none mb-1">080 - 1800 - DISPATCH</p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Incident Hotline</p>
+                            </div>
+                            <div className="bg-white/10 p-5 rounded border border-white/20">
+                                <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2">System Health</p>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-secondary">
+                                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+                                    ALL NODES OPERATIONAL
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <p className="text-[10px] text-white/30 tracking-[0.2em] font-bold uppercase">© 2026 EcoTrack Systems. High-security data environment.</p>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded">
+                            <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+                            <span className="text-[9px] font-bold text-secondary uppercase tracking-widest">Authorized Access Only</span>
                         </div>
                     </div>
                 </div>
@@ -343,7 +399,9 @@ export default function ComplaintsPage() {
                 >
                     <div className="flex justify-between items-center mb-12">
                         <Link href="/" className="flex items-center gap-2" onClick={toggleSidebar}>
-                            <Trash className="w-5 h-5 text-primary" />
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-borderColor/50">
+                                <Image src="/logo main.jpg" alt="Logo" fill className="object-cover" />
+                            </div>
                             <span className="text-xl font-semibold text-textPrimary tracking-tight italic">EcoTrack</span>
                         </Link>
                         <button 
