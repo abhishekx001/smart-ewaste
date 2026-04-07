@@ -405,7 +405,10 @@ export default function Home() {
                  {session.user.role === 'admin' && (
                    <>
                     <Link href="/complaints" className="group" onClick={toggleSidebar}>
-                      <span className="text-3xl font-semibold text-primary italic leading-none">Complaints</span>
+                      <span className="text-3xl font-semibold text-primary italic leading-none flex items-center justify-between">
+                        Complaints
+                        <span className="w-6 h-6 bg-primary text-white text-xs rounded-full flex items-center justify-center font-bold not-italic">{stats.activeAlerts}</span>
+                      </span>
                       <p className="text-[10px] text-primary/50 mt-1 uppercase tracking-widest font-medium italic">dispatch & resolution</p>
                     </Link>
                     <Link href="/add" className="group" onClick={toggleSidebar}>

@@ -94,8 +94,9 @@ export default function ComplaintsPage() {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'resolved': return 'bg-secondary/5 text-secondary border-secondary/20';
+            case 'resolved': return 'bg-secondary/10 text-secondary border-secondary/30';
             case 'in-progress': return 'bg-primary/5 text-primary border-primary/20';
+            case 'driver-completed': return 'bg-blue-50 text-blue-600 border-blue-200';
             default: return 'bg-warning/5 text-warning border-warning/20';
         }
     };
@@ -135,7 +136,12 @@ export default function ComplaintsPage() {
                     <div className="hidden lg:flex items-center gap-8">
                         <Link href="/" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Home</Link>
                         <Link href="/collect" className="text-sm font-medium text-textMuted hover:text-primary transition-colors italic">Bins Map</Link>
-                        <Link href="/complaints" className="text-sm font-semibold text-primary italic px-3 py-1 bg-primary/5 rounded">Complaints</Link>
+                        <Link href="/complaints" className="text-sm font-semibold text-primary italic px-3 py-1 bg-primary/5 rounded flex items-center gap-2">
+                            Complaints
+                            <span className="w-4 h-4 bg-primary text-white text-[9px] rounded-full flex items-center justify-center font-bold not-italic">
+                                {complaints.filter(c => c.status !== 'resolved').length}
+                            </span>
+                        </Link>
                         <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs font-bold text-danger italic pl-6 border-l border-borderColor">Logout</button>
                     </div>
 
@@ -199,42 +205,98 @@ export default function ComplaintsPage() {
                                     {session.user.role === 'admin' && (
                                         <div className="space-y-4">
                                             <div className="flex flex-col gap-2">
-                                                <label className="text-[10px] font-bold text-textMuted uppercase tracking-widest italic pb-1">Dispatch Agent</label>
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[10px] font-bold text-textMuted uppercase tracking-widest italic pb-1">Reported By</label>
+                                                    <span className="text-[10px] font-semibold text-textPrimary px-2 py-0.5 bg-borderColor/30 rounded">{item.user_id}</span>
+                                                </div>
+                                                <div className="text-[10px] text-textMuted italic mb-2">Details: {item.user_details}</div>
+                                                
+                                                <label className="text-[10px] font-bold text-textMuted uppercase tracking-widest italic pb-1 border-t border-borderColor/30 pt-3">Dispatch Agent</label>
                                                 <select
                                                     value={item.assigned_driver || ''}
                                                     onChange={(e) => handleAssignDriver(item._id, e.target.value)}
-                                                    className="input-field text-xs bg-white py-2"
+                                                    className="input-field text-xs bg-white py-2 ring-1 ring-primary/10 focus:ring-primary/40"
                                                 >
                                                     <option value="">unassigned</option>
                                                     {drivers.map((d, i) => (
-                                                        <option key={i} value={d.name}>{d.name}</option>
+                                                        <option key={i} value={d.user_id}>{d.user_id}</option>
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className="flex gap-2">
-                                                <button 
-                                                    onClick={() => handleUpdateStatus(item._id, 'in-progress')}
-                                                    className="btn-secondary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest"
-                                                >
-                                                    deploy
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleUpdateStatus(item._id, 'resolved')}
-                                                    className="btn-primary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest"
-                                                >
-                                                    archive
-                                                </button>
+                                            <div className="flex flex-col gap-3">
+                                                {!item.assigned_driver && item.status !== 'resolved' && (
+                                                    <p className="text-[9px] text-danger/70 font-bold italic uppercase tracking-tight mb-1 animate-pulse">
+                                                        * assign agent to enable dispatch controls
+                                                    </p>
+                                                )}
+                                                <div className="flex gap-2">
+                                                    {item.status === 'pending' && (
+                                                        <button 
+                                                            onClick={() => handleUpdateStatus(item._id, 'in-progress')}
+                                                            disabled={!item.assigned_driver}
+                                                            className={`flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest rounded border transition-all ${!item.assigned_driver ? 'bg-borderColor/10 text-textMuted border-borderColor/40 cursor-not-allowed' : 'btn-secondary bg-primary/5 border-primary/20 text-primary hover:bg-primary/10'}`}
+                                                        >
+                                                            Start Work
+                                                        </button>
+                                                    )}
+                                                    {item.status === 'driver-completed' && (
+                                                        <button 
+                                                            onClick={() => handleUpdateStatus(item._id, 'resolved')}
+                                                            className="btn-primary flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                                                        >
+                                                            <ShieldCheck className="w-3" /> Verify & Resolve
+                                                        </button>
+                                                    )}
+                                                    {item.status !== 'resolved' && item.status !== 'driver-completed' && (
+                                                        <button 
+                                                            onClick={() => handleUpdateStatus(item._id, 'resolved')}
+                                                            disabled={!item.assigned_driver}
+                                                            className={`flex-1 py-2 text-[10px] italic font-bold uppercase tracking-widest rounded transition-all ${!item.assigned_driver ? 'bg-borderColor/20 text-textMuted cursor-not-allowed' : 'btn-primary'}`}
+                                                        >
+                                                            Force Resolve
+                                                        </button>
+                                                    )}
+                                                    {item.status === 'resolved' && (
+                                                        <div className="w-full text-center py-2 text-[9px] font-bold text-secondary uppercase tracking-widest bg-secondary/5 border border-secondary/20 rounded">
+                                                            Ticket Finalized
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
 
                                     {session.user.role === 'driver' && item.assigned_driver === session.user.name && (
-                                        <button 
-                                            onClick={() => handleUpdateStatus(item._id, 'resolved')}
-                                            className="btn-primary w-full py-3 text-xs italic font-bold uppercase tracking-widest"
-                                        >
-                                            mark resolved
-                                        </button>
+                                        <div className="space-y-4">
+                                            <div className="text-[10px] font-bold text-primary uppercase tracking-widest italic bg-primary/5 p-3 rounded border border-primary/10 flex items-center gap-2">
+                                                <Truck className="w-3.5" /> This task is assigned to you
+                                            </div>
+                                            
+                                            <div className="flex flex-col gap-2">
+                                                <Link
+                                                    href={item.latitude && item.longitude ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.bin_location)}`}
+                                                    target="_blank"
+                                                    className="btn-secondary w-full py-2.5 text-[10px] italic font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                                                >
+                                                    <MapPin className="w-3" /> View Location Map
+                                                </Link>
+                                                
+                                                {item.status !== 'resolved' && item.status !== 'driver-completed' && (
+                                                    <button 
+                                                        onClick={() => handleUpdateStatus(item._id, 'driver-completed')}
+                                                        className="btn-primary w-full py-3 text-xs italic font-bold uppercase tracking-widest"
+                                                    >
+                                                        Mark as Completed
+                                                    </button>
+                                                )}
+                                                
+                                                {item.status === 'driver-completed' && (
+                                                    <div className="w-full text-center py-3 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded uppercase tracking-widest italic">
+                                                        Submitted - Pending Admin Review
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     )}
 
                                     {session.user.role === 'user' && (
@@ -311,7 +373,12 @@ export default function ComplaintsPage() {
                             <p className="text-[10px] text-textMuted mt-1 uppercase tracking-widest font-bold italic">network monitoring</p>
                         </Link>
                         <Link href="/complaints" className="group" onClick={toggleSidebar}>
-                            <span className="text-3xl font-semibold text-primary italic leading-none">Complaints</span>
+                            <span className="text-3xl font-semibold text-primary italic leading-none flex items-center justify-between">
+                                Complaints
+                                <span className="w-6 h-6 bg-primary text-white text-xs rounded-full flex items-center justify-center font-bold not-italic">
+                                    {complaints.filter(c => c.status !== 'resolved').length}
+                                </span>
+                            </span>
                             <p className="text-[10px] text-primary/50 mt-1 uppercase tracking-widest font-bold italic">incident management</p>
                         </Link>
                         
