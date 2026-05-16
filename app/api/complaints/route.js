@@ -50,20 +50,26 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get('userId');
         const role = searchParams.get('role');
+        const id = searchParams.get('id');
 
-        let query = supabase.from('complaints').select('*').order('created_at', { ascending: false });
+        let query = supabase.from('complaints').select('*');
 
-        if (role !== 'admin') {
-            if (!userId) {
-                return new Response(JSON.stringify({ message: "User ID is required" }), {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' },
-                });
-            }
-            if (role === 'driver') {
-                query = query.eq('assigned_driver', userId);
-            } else {
-                query = query.eq('user_id', userId);
+        if (id) {
+            query = query.eq('id', id);
+        } else {
+            query = query.order('created_at', { ascending: false });
+            if (role !== 'admin') {
+                if (!userId) {
+                    return new Response(JSON.stringify({ message: "User ID is required" }), {
+                        status: 400,
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                }
+                if (role === 'driver') {
+                    query = query.eq('assigned_driver', userId);
+                } else {
+                    query = query.eq('user_id', userId);
+                }
             }
         }
 
@@ -94,7 +100,7 @@ export async function GET(request) {
 export async function PATCH(request) {
     try {
         const body = await request.json();
-        const { id, status, assigned_driver } = body;
+        const { id, status, assigned_driver, userDetails, binLocation, description, latitude, longitude, image_data } = body;
 
         if (!id) {
             return new Response(JSON.stringify({ message: "Complaint ID is required" }), {
@@ -106,6 +112,12 @@ export async function PATCH(request) {
         const updateData = {};
         if (status) updateData.status = status;
         if (assigned_driver !== undefined) updateData.assigned_driver = assigned_driver;
+        if (userDetails) updateData.user_details = userDetails;
+        if (binLocation) updateData.bin_location = binLocation;
+        if (description) updateData.description = description;
+        if (latitude !== undefined) updateData.latitude = latitude;
+        if (longitude !== undefined) updateData.longitude = longitude;
+        if (image_data !== undefined) updateData.image_data = image_data;
 
         const { data, error } = await supabase
             .from('complaints')
@@ -126,6 +138,41 @@ export async function PATCH(request) {
     } catch (error) {
         console.error("Update complaint error:", error);
         return new Response(JSON.stringify({ message: "Failed to update complaint", error: error.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+}
+
+export async function DELETE(request) {
+    try {
+        const body = await request.json();
+        const { id } = body;
+
+        if (!id) {
+            return new Response(JSON.stringify({ message: "Complaint ID is required" }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        const { error } = await supabase
+            .from('complaints')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        return new Response(JSON.stringify({ message: "Complaint deleted successfully" }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+    } catch (error) {
+        console.error("Delete complaint error:", error);
+        return new Response(JSON.stringify({ message: "Failed to delete complaint", error: error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });

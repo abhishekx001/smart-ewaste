@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { AlertCircle, Camera, MapPin, ChevronLeft, CheckCircle2, Loader2, Send } from 'lucide-react';
 
-export default function SubmitComplaintPage() {
+function ComplaintFormContent() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    const isEditMode = searchParams.get('edit') === 'true';
+    const editId = searchParams.get('id');
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -22,6 +26,31 @@ export default function SubmitComplaintPage() {
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [locationError, setLocationError] = useState('');
     const [imageBase64, setImageBase64] = useState('');
+
+    useEffect(() => {
+        if (isEditMode && editId) {
+            const fetchComplaint = async () => {
+                try {
+                    const res = await fetch(`/api/complaints?id=${editId}`);
+                    const data = await res.json();
+                    if (res.ok && data.complaints?.[0]) {
+                        const complaint = data.complaints[0];
+                        setFormData({
+                            userDetails: complaint.user_details || '',
+                            binLocation: complaint.bin_location || '',
+                            description: complaint.description || ''
+                        });
+                        setLatitude(complaint.latitude || '');
+                        setLongitude(complaint.longitude || '');
+                        setImageBase64(complaint.image_data || '');
+                    }
+                } catch (err) {
+                    console.error("Fetch complaint error:", err);
+                }
+            };
+            fetchComplaint();
+        }
+    }, [isEditMode, editId]);
 
     const getLocation = () => {
         setLoadingLocation(true);
@@ -63,24 +92,31 @@ export default function SubmitComplaintPage() {
         setIsSubmitting(true);
         setMessage({ type: '', text: '' });
         try {
+            const method = isEditMode ? 'PATCH' : 'POST';
+            const payload = {
+                userId: session.user.name,
+                latitude,
+                longitude,
+                image_data: imageBase64,
+                ...formData
+            };
+            if (isEditMode) payload.id = editId;
+
             const res = await fetch('/api/complaints', {
-                method: 'POST',
+                method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: session.user.name,
-                    latitude,
-                    longitude,
-                    image_data: imageBase64,
-                    ...formData
-                })
+                body: JSON.stringify(payload)
             });
+
             if (res.ok) {
-                setMessage({ type: 'success', text: 'complaint submitted successfully!' });
-                setFormData({ userDetails: '', binLocation: '', description: '' });
-                setLatitude(''); setLongitude(''); setImageBase64('');
+                setMessage({ type: 'success', text: isEditMode ? 'complaint updated successfully!' : 'complaint submitted successfully!' });
+                if (!isEditMode) {
+                    setFormData({ userDetails: '', binLocation: '', description: '' });
+                    setLatitude(''); setLongitude(''); setImageBase64('');
+                }
                 setTimeout(() => router.push('/complaints'), 2000);
             } else {
-                setMessage({ type: 'error', text: 'submission failed' });
+                setMessage({ type: 'error', text: isEditMode ? 'update failed' : 'submission failed' });
             }
         } catch (error) {
             setMessage({ type: 'error', text: 'an unexpected error occurred' });
@@ -97,13 +133,13 @@ export default function SubmitComplaintPage() {
         );
     }
 
-    if (status === 'unauthenticated' || session?.user?.role !== 'user') {
+    if (status === 'unauthenticated' || (session?.user?.role !== 'user' && session?.user?.role !== 'admin')) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white px-6">
                 <div className="max-w-md w-full bg-red-50 p-10 rounded-lg border border-red-100 text-center">
                     <AlertCircle className="w-12 h-12 text-danger mx-auto mb-6" />
                     <h1 className="text-xl font-semibold text-danger mb-2">access denied</h1>
-                    <p className="text-sm text-red-600/70 mb-8">you must be logged in as a registered user to submit complaints.</p>
+                    <p className="text-sm text-red-600/70 mb-8">you must be logged in as a registered user to manage complaints.</p>
                     <Link href="/login" className="btn-secondary inline-block w-full text-center">go to login portal</Link>
                 </div>
             </div>
@@ -114,13 +150,13 @@ export default function SubmitComplaintPage() {
         <div className="min-h-screen bg-white font-poppins text-textPrimary py-12 px-6">
             <div className="max-w-2xl mx-auto">
                 <div className="mb-12">
-                    <Link href="/" className="inline-flex items-center gap-2 text-xs font-medium text-textMuted hover:text-primary transition-colors mb-6 italic">
-                        <ChevronLeft className="w-3 h-3" /> back to home
+                    <Link href="/complaints" className="inline-flex items-center gap-2 text-xs font-medium text-textMuted hover:text-primary transition-colors mb-6 italic">
+                        <ChevronLeft className="w-3 h-3" /> back to records
                     </Link>
                     <h1 className="text-3xl font-semibold tracking-tight uppercase italic text-textPrimary">
-                        report <span className="text-primary italic">incident</span>
+                        {isEditMode ? 'edit' : 'report'} <span className="text-primary italic">incident</span>
                     </h1>
-                    <p className="text-sm text-textMuted mt-1">document and report overflow or damage to the city audit team</p>
+                    <p className="text-sm text-textMuted mt-1">{isEditMode ? 'update your previous report details' : 'document and report overflow or damage to the city audit team'}</p>
                 </div>
 
                 <div className="bg-white border border-borderColor rounded-lg p-10">
@@ -219,16 +255,28 @@ export default function SubmitComplaintPage() {
                                 disabled={isSubmitting}
                                 className="w-full btn-primary py-4 flex items-center justify-center gap-2 disabled:opacity-50"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                {isSubmitting ? 'submitting report...' : 'dispatch complaint'}
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (isEditMode ? <CheckCircle2 className="w-4 h-4" /> : <Send className="w-4 h-4" />)}
+                                {isSubmitting ? (isEditMode ? 'updating record...' : 'submitting report...') : (isEditMode ? 'save changes' : 'dispatch complaint')}
                             </button>
                             <Link href="/complaints" className="btn-secondary w-full text-center py-4 text-xs italic">
-                                cancel and view records
+                                cancel process
                             </Link>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SubmitComplaintPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        }>
+            <ComplaintFormContent />
+        </Suspense>
     );
 }

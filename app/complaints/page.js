@@ -93,6 +93,22 @@ export default function ComplaintsPage() {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to permanently delete this resolved complaint record?')) return;
+        try {
+            const res = await fetch('/api/complaints', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id }),
+            });
+            if (res.ok) {
+                setComplaints(complaints.filter(c => c._id !== id));
+            }
+        } catch (err) {
+            console.error("Delete complaint error:", err);
+        }
+    };
+
     const getStatusStyle = (status) => {
         switch (status) {
             case 'resolved': return 'bg-secondary/10 text-secondary border-secondary/30';
@@ -197,6 +213,20 @@ export default function ComplaintsPage() {
                                     </span>
                                 </div>
                                 <h3 className="text-lg font-semibold text-textPrimary mb-1 italic leading-tight capitalize">{item.bin_location}</h3>
+                                
+                                {item.image_data && (
+                                    <div className="relative w-full h-48 my-6 rounded-xl overflow-hidden border border-borderColor bg-white group-hover:border-primary/30 transition-all duration-300 shadow-sm">
+                                        <img 
+                                            src={item.image_data} 
+                                            alt="Evidence" 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                            <span className="text-[10px] font-bold text-white uppercase tracking-widest italic">Visual Evidence Attached</span>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <p className="text-sm text-textMuted mb-6 italic leading-relaxed">"{item.description}"</p>
 
                                 <div className="mt-auto space-y-5">
@@ -259,14 +289,29 @@ export default function ComplaintsPage() {
                                                             Force Resolve
                                                         </button>
                                                     )}
-                                                    {item.status === 'resolved' && (
-                                                        <div className="w-full text-center py-2 text-[9px] font-bold text-secondary uppercase tracking-widest bg-secondary/5 border border-secondary/20 rounded">
-                                                            Ticket Finalized
-                                                        </div>
-                                                    )}
+                                                    <Link 
+                                                        href={`/complaints/new?edit=true&id=${item._id}`}
+                                                        className="p-2 border border-borderColor rounded hover:bg-white transition-colors"
+                                                        title="Edit Incident Details"
+                                                    >
+                                                        <Settings2 className="w-3 h-3 text-textMuted" />
+                                                    </Link>
+                                                </div>
+                                                     {item.status === 'resolved' && (
+                                                         <div className="flex flex-col gap-3 w-full">
+                                                             <div className="w-full text-center py-2 text-[9px] font-bold text-secondary uppercase tracking-widest bg-secondary/5 border border-secondary/20 rounded">
+                                                                 Ticket Finalized
+                                                             </div>
+                                                             <button
+                                                                 onClick={() => handleDelete(item._id)}
+                                                                 className="w-full py-2 text-[9px] font-bold text-danger uppercase tracking-widest hover:bg-red-50 border border-red-100 rounded flex items-center justify-center gap-2 transition-colors"
+                                                             >
+                                                                 <Trash2 className="w-3" /> Purge Record
+                                                             </button>
+                                                         </div>
+                                                     )}
                                                 </div>
                                             </div>
-                                        </div>
                                     )}
 
                                     {session.user.role === 'driver' && item.assigned_driver === session.user.name && (
@@ -303,8 +348,18 @@ export default function ComplaintsPage() {
                                     )}
 
                                     {session.user.role === 'user' && (
-                                        <div className="flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded text-[10px] font-bold text-textMuted uppercase tracking-wider italic">
-                                            <User className="w-3" /> Agent: {item.assigned_driver || 'pending dispatch'}
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-white border border-borderColor rounded text-[10px] font-bold text-textMuted uppercase tracking-wider italic">
+                                                <User className="w-3" /> Agent: {item.assigned_driver || 'pending dispatch'}
+                                            </div>
+                                            {item.status === 'pending' && (
+                                                <Link 
+                                                    href={`/complaints/new?edit=true&id=${item._id}`}
+                                                    className="btn-secondary w-full py-2 text-[10px] italic font-bold uppercase tracking-widest flex items-center justify-center gap-2 border-primary/20 text-primary hover:bg-primary/5"
+                                                >
+                                                    <Settings2 className="w-3" /> Edit Incident Details
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>

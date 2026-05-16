@@ -309,9 +309,16 @@ export default function Home() {
                 <div className="col-span-1">
                   <AlertCircle className={`w-4 h-4 ${comp.status === 'resolved' ? 'text-secondary' : 'text-warning'}`} />
                 </div>
-                <div className="col-span-8 flex flex-col">
-                  <span className="font-semibold">{comp.bin_location}</span>
-                  <span className="text-xs text-textMuted truncate italic">"{comp.description}"</span>
+                <div className="col-span-8 flex items-center gap-4">
+                  {comp.image_data && (
+                    <div className="relative w-10 h-10 rounded border border-borderColor overflow-hidden flex-shrink-0">
+                      <img src={comp.image_data} alt="Evidence" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-semibold truncate">{comp.bin_location}</span>
+                    <span className="text-xs text-textMuted truncate italic">"{comp.description}"</span>
+                  </div>
                 </div>
                 <div className="col-span-3 text-right text-xs text-textMuted italic">
                   {new Date(comp.created_at).toLocaleDateString()}
